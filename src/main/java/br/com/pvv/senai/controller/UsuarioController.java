@@ -96,8 +96,8 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 			throws UsuarioNotFoundException, MethodArgumentNotValidException, HttpMessageNotReadableException,
 			UnauthorizationException {
 
-		if (!principal.getName().equals(email))
-			throw new UnauthorizationException();
+//		if (!principal.getName().equals(email))
+//			throw new UnauthorizationException();
 
 		var oUsuario = service.findByEmail(email);
 		if (oUsuario.isEmpty())
