@@ -43,9 +43,6 @@ import jakarta.validation.constraints.Size;
 public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 
 	@Autowired
-	private TokenService jwtService;
-
-	@Autowired
 	private UsuarioService service;
 
 	@Override
@@ -57,7 +54,7 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 	public IFilter<Usuario> filterBuilder(Map<String, String> params) throws Exception {
 		return new UsuarioFilter(params);
 	}
-	
+
 	@GetMapping("/me")
 	public ResponseEntity me(Principal principal) {
 		var usuario = service.findByEmail(principal.getName());
@@ -99,7 +96,7 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 			throws UsuarioNotFoundException, MethodArgumentNotValidException, HttpMessageNotReadableException,
 			UnauthorizationException {
 
-		if (principal.getName() != email)
+		if (!principal.getName().equals(email))
 			throw new UnauthorizationException();
 
 		var oUsuario = service.findByEmail(email);
@@ -110,8 +107,6 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 		usuario.setPassword(new BCryptPasswordEncoder().encode(password));
 		service.alter(usuario.getId(), usuario);
 
-		var token = jwtService.generateToken(usuario);
-
-		return ResponseEntity.ok(token);
+		return ResponseEntity.noContent().build();
 	}
 }
