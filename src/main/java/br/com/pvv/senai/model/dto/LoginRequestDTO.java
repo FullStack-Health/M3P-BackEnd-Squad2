@@ -1,8 +1,14 @@
 package br.com.pvv.senai.model.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+
 public class LoginRequestDTO {
 
+	@NotNull
+	@Email
 	private String username;
+	@NotNull
 	private String password;
 
 	public String getUsername() {

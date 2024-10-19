@@ -1,5 +1,6 @@
 package br.com.pvv.senai.exceptions;
 
+import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -83,8 +84,15 @@ public class ExceptionAdvicer {
 		return ResponseEntity.status(401).body("Não autorizado.");
 	}
 
+	@ExceptionHandler(BadRequestException.class)
+	public ResponseEntity excessao9(BadRequestException ex) {
+		log.error("UnauthorizationException");
+		log.error(ex.getMessage());
+		return ResponseEntity.status(401).body("Requisição mal formada.");
+	}
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity excessao8(MethodArgumentNotValidException ex) {
+	public ResponseEntity excessao10(MethodArgumentNotValidException ex) {
 		log.error("MethodArgumentNotValidException");
 		log.error(ex.getMessage());
 		return ResponseEntity.status(400).body("Requisição inválida em razão de campo inválido: " + ex.getMessage());

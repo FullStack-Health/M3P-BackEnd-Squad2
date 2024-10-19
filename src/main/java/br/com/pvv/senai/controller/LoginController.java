@@ -1,9 +1,11 @@
 package br.com.pvv.senai.controller;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +16,7 @@ import br.com.pvv.senai.exceptions.UnauthorizationException;
 import br.com.pvv.senai.model.dto.LoginRequestDTO;
 import br.com.pvv.senai.repository.UserRepository;
 import br.com.pvv.senai.security.TokenService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/login")
@@ -29,7 +32,7 @@ public class LoginController {
 	private TokenService jwtService;
 
 	@PostMapping
-	public ResponseEntity login(@RequestBody LoginRequestDTO login) throws UnauthorizationException {
+	public ResponseEntity login(@RequestBody @Valid LoginRequestDTO login) throws MethodArgumentNotValidException, UnauthorizationException {
 		var usernamePassword = new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword());
 		try {
 			var auth = this.manager.authenticate(usernamePassword);
