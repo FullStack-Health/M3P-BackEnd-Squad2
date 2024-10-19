@@ -97,8 +97,9 @@ public class SecurityConfig {
 //								"/exames/{id}", //
 //								"/consultas/{id}", //
 								"/pacientes" , //
-								"/usuarios"
 //								"/pacientes/{id}", //
+								"/usuarios",
+								"/usuarios/me"
 						).hasAuthority(Perfil.MEDICO.scope())
 						// PACIENTES
 						.requestMatchers(HttpMethod.GET, //

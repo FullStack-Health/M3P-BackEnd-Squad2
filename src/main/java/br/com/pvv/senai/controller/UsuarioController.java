@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -55,6 +56,12 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 	@Override
 	public IFilter<Usuario> filterBuilder(Map<String, String> params) throws Exception {
 		return new UsuarioFilter(params);
+	}
+	
+	@GetMapping("/me")
+	public ResponseEntity me(Principal principal) {
+		var usuario = service.findByEmail(principal.getName());
+		return ResponseEntity.ok(usuario);
 	}
 
 	@PostMapping("pre-registro")
