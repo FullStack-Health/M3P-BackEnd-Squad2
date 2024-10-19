@@ -97,4 +97,11 @@ public class ExceptionAdvicer {
 		log.error(ex.getMessage());
 		return ResponseEntity.status(400).body("Requisição inválida em razão de campo inválido: " + ex.getMessage());
 	}
+	
+	@ExceptionHandler(EmailViolationExistentException.class)
+	public ResponseEntity excessao11(EmailViolationExistentException ex) {
+		log.error("EmailViolationExistentException");
+		log.error(ex.getMessage());
+		return ResponseEntity.status(409).body("E-mail já cadastrado.");
+	}
 }

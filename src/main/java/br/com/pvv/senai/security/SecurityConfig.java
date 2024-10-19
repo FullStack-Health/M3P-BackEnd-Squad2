@@ -104,7 +104,7 @@ public class SecurityConfig {
 								"/exames/{id}")
 						.hasAuthority(Perfil.PACIENTE.scope())
 						// QUEST
-						.requestMatchers("/login").permitAll()
+						.requestMatchers("/login", "/usuario/pre-registro").permitAll()
 				// OUTRAS ROTAS
 //						.anyRequest().denyAll()//
 				).oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
