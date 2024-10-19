@@ -3,6 +3,7 @@ package br.com.pvv.senai.controller;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,10 +30,18 @@ public abstract class GenericController<U extends GenericDto<T>, T extends IEnti
 
 	@GetMapping
 	public ResponseEntity<Page<T>> list(@RequestParam Map<String, String> params) throws Exception {
-		var filter = this.filterBuilder(params);
-		var list = getService().paged(filter.example(), filter.getPagination());
-		if (list.hasContent())
-			return ResponseEntity.ok(list);
+		if (params.size() != 0) {
+			var filter = this.filterBuilder(params);
+			var list = getService().paged(filter.example(), filter.getPagination());
+			if (list.hasContent())
+				return ResponseEntity.ok(list);
+		} else {
+			var list = getService().all();
+			if (list.size() > 0) {
+				PageImpl<T> p = new PageImpl<T>(list);
+				return ResponseEntity.ok(p);
+			}
+		}
 		return ResponseEntity.notFound().build();
 	}
 

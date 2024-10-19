@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.pvv.senai.controller.filter.IFilter;
+import br.com.pvv.senai.controller.filter.UsuarioFilter;
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.exceptions.DtoToEntityException;
@@ -53,7 +54,7 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 
 	@Override
 	public IFilter<Usuario> filterBuilder(Map<String, String> params) throws Exception {
-		throw new UnsupportedOperationException();
+		return new UsuarioFilter(params);
 	}
 
 	@PostMapping("pre-registro")
@@ -73,26 +74,27 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 		entity.setPassword(null);
 		return ResponseEntity.status(201).body(entity);
 	}
-	
+
 	@Override
-	@PostMapping
 	public ResponseEntity post(@Valid UsuarioDto model) throws DtoToEntityException, NotAuthorizedException, Exception {
-		if (model.getPerfil() == Perfil.PACIENTE) throw new NotAuthorizedException();
-		
+		if (model.getPerfil() == Perfil.PACIENTE)
+			throw new NotAuthorizedException();
+
 		model.setPassword(new BCryptPasswordEncoder().encode(model.getPassword()));
-		
+
 		return super.post(model);
 	}
 
 	@PutMapping("email/{email}/redefinir-senha")
-	public ResponseEntity changePassword(
-			Principal principal,
+	public ResponseEntity changePassword(Principal principal,
 			@NotNull @Valid @Size(max = 255) @RequestBody String password,
 			@PathVariable @Valid @Email(message = "E-mail inválido") @NotEmpty(message = "Campo de e-mail necessário") String email)
-			throws UsuarioNotFoundException, MethodArgumentNotValidException, HttpMessageNotReadableException, UnauthorizationException {
-		
-		if (principal.getName() != email) throw new UnauthorizationException();
-		
+			throws UsuarioNotFoundException, MethodArgumentNotValidException, HttpMessageNotReadableException,
+			UnauthorizationException {
+
+		if (principal.getName() != email)
+			throw new UnauthorizationException();
+
 		var oUsuario = service.findByEmail(email);
 		if (oUsuario.isEmpty())
 			throw new UsuarioNotFoundException();

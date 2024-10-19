@@ -96,7 +96,8 @@ public class SecurityConfig {
 								"/pacientes/prontuarios", //
 //								"/exames/{id}", //
 //								"/consultas/{id}", //
-								"/pacientes" // , //
+								"/pacientes" , //
+								"/usuarios"
 //								"/pacientes/{id}", //
 						).hasAuthority(Perfil.MEDICO.scope())
 						// PACIENTES
