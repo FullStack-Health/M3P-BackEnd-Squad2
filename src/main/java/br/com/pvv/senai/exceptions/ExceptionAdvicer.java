@@ -104,11 +104,19 @@ public class ExceptionAdvicer {
 		log.error(ex.getMessage());
 		return ResponseEntity.status(400).body("Requisição inválida em razão de campo inválido.");
 	}
-	
+
 	@ExceptionHandler(EmailViolationExistentException.class)
 	public ResponseEntity excessao(EmailViolationExistentException ex) {
 		log.error("EmailViolationExistentException");
 		log.error(ex.getMessage());
 		return ResponseEntity.status(409).body("E-mail já cadastrado.");
 	}
+
+	@ExceptionHandler(NotAuthorizedException.class)
+	public ResponseEntity excessao(NotAuthorizedException ex) {
+		log.error("NotAuthorizedException");
+		log.error(ex.getMessage());
+		return ResponseEntity.status(400).body("Não autorizado por designação do projeto.");
+	}
+
 }

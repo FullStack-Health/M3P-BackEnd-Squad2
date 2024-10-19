@@ -2,45 +2,26 @@ package br.com.pvv.senai.model.dto;
 
 import java.util.Date;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public class UsuarioDto extends GenericDto<Usuario> {
+public class UsuarioDtoMinimal extends GenericDto<Usuario> {
 
 	private long Id;
-	@NotNull
-	@Size(max = 255)
 	private String nome;
 	@NotNull
-	@Pattern(regexp = "\\(\\d{2}+\\) \\d{1}+ \\d{4}+-\\d{4}+")
-	private String telefone;
-	@NotNull
-	@Email
 	@Size(max = 255)
 	private String email;
-	@DateTimeFormat(pattern = "yyyy-mm-dd")
 	private Date dataNascimento;
-	@NotNull
-	@Size(max = 14)
 	private String cpf;
 	@NotNull
 	@Size(max = 255)
 	private String password;
 	private Perfil perfil;
-
-	public String getTelefone() {
-		return telefone;
-	}
-
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
-	}
 
 	public long getId() {
 		return Id;

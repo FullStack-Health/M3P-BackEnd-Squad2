@@ -28,6 +28,8 @@ public class Usuario implements UserDetails, IEntity {
 	private long Id;
 	@Column(length = 255)
 	private String nome;
+	@Column()
+	private String telefone;
 	@Column(length = 255, unique = true)
 	private String email;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -40,6 +42,14 @@ public class Usuario implements UserDetails, IEntity {
 	private String password;
 	@Column()
 	private Perfil perfil;
+
+	public String getTelefone() {
+		return telefone;
+	}
+
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
+	}
 
 	public long getId() {
 		return Id;

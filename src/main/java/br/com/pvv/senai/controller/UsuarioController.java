@@ -22,9 +22,11 @@ import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.exceptions.DtoToEntityException;
 import br.com.pvv.senai.exceptions.EmailViolationExistentException;
+import br.com.pvv.senai.exceptions.NotAuthorizedException;
 import br.com.pvv.senai.exceptions.UnauthorizationException;
 import br.com.pvv.senai.exceptions.UsuarioNotFoundException;
 import br.com.pvv.senai.model.dto.UsuarioDto;
+import br.com.pvv.senai.model.dto.UsuarioDtoMinimal;
 import br.com.pvv.senai.security.TokenService;
 import br.com.pvv.senai.security.UsuarioService;
 import br.com.pvv.senai.service.GenericService;
@@ -55,7 +57,7 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 	}
 
 	@PostMapping("pre-registro")
-	public ResponseEntity<Usuario> register(@RequestBody @Valid UsuarioDto model)
+	public ResponseEntity<Usuario> register(@RequestBody @Valid UsuarioDtoMinimal model)
 			throws MethodArgumentNotValidException, DtoToEntityException, BadRequestException,
 			EmailViolationExistentException {
 		if (model.getPerfil() != Perfil.MEDICO && model.getPerfil() != Perfil.ADMIN)
@@ -70,6 +72,16 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 		}
 		entity.setPassword(null);
 		return ResponseEntity.status(201).body(entity);
+	}
+	
+	@Override
+	@PostMapping
+	public ResponseEntity post(@Valid UsuarioDto model) throws DtoToEntityException, NotAuthorizedException, Exception {
+		if (model.getPerfil() == Perfil.PACIENTE) throw new NotAuthorizedException();
+		
+		model.setPassword(new BCryptPasswordEncoder().encode(model.getPassword()));
+		
+		return super.post(model);
 	}
 
 	@PutMapping("email/{email}/redefinir-senha")
