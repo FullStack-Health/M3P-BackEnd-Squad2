@@ -81,7 +81,9 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.PUT, //
 								"/exames/{id}", //
 								"/consultas/{id}", //
-								"/pacientes/{id}")
+								"/pacientes/{id}",
+								"/usuarios/email/{email}/redefinir-senha"
+								)
 						.hasAuthority(Perfil.MEDICO.scope())//
 						.requestMatchers(HttpMethod.DELETE, //
 								"/exames/{id}", //
@@ -95,7 +97,7 @@ public class SecurityConfig {
 //								"/exames/{id}", //
 //								"/consultas/{id}", //
 								"/pacientes" // , //
-//								"/pacientes/{id}" //
+//								"/pacientes/{id}", //
 						).hasAuthority(Perfil.MEDICO.scope())
 						// PACIENTES
 						.requestMatchers(HttpMethod.GET, //
@@ -104,7 +106,7 @@ public class SecurityConfig {
 								"/exames/{id}")
 						.hasAuthority(Perfil.PACIENTE.scope())
 						// QUEST
-						.requestMatchers("/login", "/usuario/pre-registro").permitAll()
+						.requestMatchers("/login", "/usuarios/pre-registro").permitAll()
 				// OUTRAS ROTAS
 //						.anyRequest().denyAll()//
 				).oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
