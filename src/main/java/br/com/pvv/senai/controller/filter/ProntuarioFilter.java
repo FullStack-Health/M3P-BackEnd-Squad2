@@ -35,7 +35,7 @@ public class ProntuarioFilter implements IFilter<Paciente> {
 		Paciente paciente = new Paciente();
 
 		if (this.getNome() != null)
-			paciente.setNome(this.getNome());
+			paciente.setName(this.getNome());
 		if (this.getNumeroRegistro() != null)
 			paciente.setId(Integer.valueOf(this.getNumeroRegistro()));
 

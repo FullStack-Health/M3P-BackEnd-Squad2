@@ -100,7 +100,7 @@ public class SecurityConfig {
 								"/usuarios",
 								"/usuarios/me"
 						).hasAuthority(Perfil.MEDICO.scope())
-						// PACIENTES
+						// pacientes
 						.requestMatchers(HttpMethod.GET, //
 								"/pacientes/{id}", //
 								"/consultas/{id}", //

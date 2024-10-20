@@ -15,12 +15,12 @@ public class PacienteDto extends GenericDto<Paciente> {
 	private long id;
 	@NotNull
 	@Size(min = 8, max = 64)
-	private String nome;
+	private String name;
 	@NotNull
-	private String genero;
+	private String gender;
 	@NotNull
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
-	private Date dataNascimento;
+	private Date birthDate;
 	@NotNull
 	@Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}")
 	private String CPF;
@@ -28,60 +28,29 @@ public class PacienteDto extends GenericDto<Paciente> {
 	@Size(max = 20)
 	private String RG;
 	@NotNull
-	private String estadoCivil;
+	private String maritalStatus;
 	@NotNull
 	@Pattern(regexp = "\\(\\d{2}\\) \\d{1} \\d{4}-\\d{4}")
-	private String telefone;
+	private String phone;
 	@Email
 	private String email;
 	@NotNull
 	@Size(min = 8, max = 64)
-	private String naturalidade;
+	private String birthCity;
 	@NotNull
 	@Pattern(regexp = "\\(\\d{2}\\) \\d{1} \\d{4}-\\d{4}")
-	private String cttDeEmergencia;
-	private String alergias;
-	private String cuidadosEspecificos;
-	private String convenio;
-	private String numeroConvenio;
-	private Date validadeConvenio;
-	private EnderecoDto endereco;
+	private String emergencyContact;
+	private String allergies;
+	private String specialCare;
+	private String insuranceCompany;
+	private String insuranceNumber;
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
+	private Date insuranceExpiration;
+	private EnderecoDto address;
 
 	@Override
 	protected Class<Paciente> getType() {
 		return Paciente.class;
-	}
-
-	public String getConvenio() {
-		return convenio;
-	}
-
-	public void setConvenio(String convenio) {
-		this.convenio = convenio;
-	}
-
-	public Date getDataNascimento() {
-		return dataNascimento;
-	}
-
-	public void setDataNascimento(Date dataNascimento) {
-		this.dataNascimento = dataNascimento;
-	}
-
-	public String getNome() {
-		return nome;
-	}
-
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
-
-	public String getTelefone() {
-		return telefone;
-	}
-
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
 	}
 
 	public long getId() {
@@ -89,15 +58,31 @@ public class PacienteDto extends GenericDto<Paciente> {
 	}
 
 	public void setId(long id) {
-		id = id;
+		this.id = id;
 	}
 
-	public String getGenero() {
-		return genero;
+	public String getName() {
+		return name;
 	}
 
-	public void setGenero(String genero) {
-		this.genero = genero;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public Date getBirthDate() {
+		return birthDate;
+	}
+
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
 	}
 
 	public String getCPF() {
@@ -116,12 +101,20 @@ public class PacienteDto extends GenericDto<Paciente> {
 		RG = rG;
 	}
 
-	public String getEstadoCivil() {
-		return estadoCivil;
+	public String getMaritalStatus() {
+		return maritalStatus;
 	}
 
-	public void setEstadoCivil(String estadoCivil) {
-		this.estadoCivil = estadoCivil;
+	public void setMaritalStatus(String maritalStatus) {
+		this.maritalStatus = maritalStatus;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	public String getEmail() {
@@ -132,60 +125,68 @@ public class PacienteDto extends GenericDto<Paciente> {
 		this.email = email;
 	}
 
-	public String getNaturalidade() {
-		return naturalidade;
+	public String getBirthCity() {
+		return birthCity;
 	}
 
-	public void setNaturalidade(String naturalidade) {
-		this.naturalidade = naturalidade;
+	public void setBirthCity(String birthCity) {
+		this.birthCity = birthCity;
 	}
 
-	public String getCttDeEmergencia() {
-		return cttDeEmergencia;
+	public String getEmergencyContact() {
+		return emergencyContact;
 	}
 
-	public void setCttDeEmergencia(String cttDeEmergencia) {
-		this.cttDeEmergencia = cttDeEmergencia;
+	public void setEmergencyContact(String emergencyContact) {
+		this.emergencyContact = emergencyContact;
 	}
 
-	public String getAlergias() {
-		return alergias;
+	public String getAllergies() {
+		return allergies;
 	}
 
-	public void setAlergias(String alergias) {
-		this.alergias = alergias;
+	public void setAllergies(String allergies) {
+		this.allergies = allergies;
 	}
 
-	public String getCuidadosEspecificos() {
-		return cuidadosEspecificos;
+	public String getSpecialCare() {
+		return specialCare;
 	}
 
-	public void setCuidadosEspecificos(String cuidadosEspecificos) {
-		this.cuidadosEspecificos = cuidadosEspecificos;
+	public void setSpecialCare(String specialCare) {
+		this.specialCare = specialCare;
 	}
 
-	public String getNumeroConvenio() {
-		return numeroConvenio;
+	public String getInsuranceCompany() {
+		return insuranceCompany;
 	}
 
-	public void setNumeroConvenio(String numeroConvenio) {
-		this.numeroConvenio = numeroConvenio;
+	public void setInsuranceCompany(String insuranceCompany) {
+		this.insuranceCompany = insuranceCompany;
 	}
 
-	public Date getValidadeConvenio() {
-		return validadeConvenio;
+	public String getInsuranceNumber() {
+		return insuranceNumber;
 	}
 
-	public void setValidadeConvenio(Date validadeConvenio) {
-		this.validadeConvenio = validadeConvenio;
+	public void setInsuranceNumber(String insuranceNumber) {
+		this.insuranceNumber = insuranceNumber;
 	}
 
-	public EnderecoDto getEndereco() {
-		return endereco;
+	public Date getInsuranceExpiration() {
+		return insuranceExpiration;
 	}
 
-	public void setEndereco(EnderecoDto endereco) {
-		this.endereco = endereco;
+	public void setInsuranceExpiration(Date insuranceExpiration) {
+		this.insuranceExpiration = insuranceExpiration;
+	}
+
+	public EnderecoDto getAddress() {
+		return address;
+	}
+
+	public void setAddress(EnderecoDto address) {
+		this.address = address;
 	}
 
 }

@@ -41,8 +41,8 @@ public class PacienteFilter implements IFilter<Paciente> {
 				.withIgnoreNullValues();
 
 		Paciente paciente = new Paciente();
-		paciente.setNome(this.getNome());
-		paciente.setTelefone(this.getTelefone());
+		paciente.setName(this.getNome());
+		paciente.setPhone(this.getTelefone());
 		paciente.setEmail(this.getTelefone());
 
 		return Example.of(paciente, matcher);

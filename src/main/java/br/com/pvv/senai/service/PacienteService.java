@@ -27,7 +27,7 @@ public class PacienteService extends GenericService<Paciente> {
 
 	@Override
 	public Paciente create(Paciente model) {
-		var endereco = this.enderecoService.create(model.getEndereco());
+		var endereco = this.enderecoService.create(model.getAddress());
 		var usuario = this.userService.findByEmail(model.getEmail()).get();
 		model.setUsuario(usuario);
 		var retorno = super.create(model);
@@ -38,9 +38,9 @@ public class PacienteService extends GenericService<Paciente> {
 	@Override
 	public Paciente alter(long id, Paciente model) {
 		model.setId(id);
-		var endereco = model.getEndereco();
+		var endereco = model.getAddress();
 		if (endereco != null && endereco.getId() == 0)
-			endereco = this.enderecoService.create(model.getEndereco());
+			endereco = this.enderecoService.create(model.getAddress());
 		var usuario = this.userService.findByEmail(model.getEmail()).get();
 		model.setUsuario(usuario);
 		var retorno = super.create(model);

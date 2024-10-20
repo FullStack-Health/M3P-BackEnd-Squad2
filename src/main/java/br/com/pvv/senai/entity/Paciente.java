@@ -23,41 +23,41 @@ public class Paciente implements IEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	@Column(length = 64, nullable = false)
-	private String nome; // 8-64
+	private String name; // 8-64
 	@Column(nullable = false)
-	private String genero;
+	private String gender;
 	@Column(nullable = false)
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date dataNascimento;
+	private Date birthDate;
 	@Column(length = 14) // 000.000.000-00
 	@NumberFormat(pattern = "###.###.###-##")
 	private String CPF;
 	@Column(length = 20)
 	private String RG;
 	@Column(nullable = false)
-	private String estadoCivil;
+	private String maritalStatus;
 	@Column(nullable = false)
 	@NumberFormat(pattern = "(##) # ####-####")
-	private String telefone;
+	private String phone;
 	@Column()
 	private String email; // regex \w+@\w+
 	@Column(nullable = false, length = 64) // 8-64
-	private String naturalidade;
+	private String birthCity;
 	@Column(nullable = false)
 	@NumberFormat(pattern = "(##) # ####-####")
-	private String cttDeEmergencia;
+	private String emergencyContact;
 	@Column()
-	private String alergias;
+	private String allergies;
 	@Column()
-	private String cuidadosEspecificos;
+	private String specialCare;
 	@Column()
-	private String convenio;
+	private String insuranceCompany;
 	@Column()
-	private String numeroConvenio;
+	private String insuranceNumber;
 	@Column()
-	private Date validadeConvenio;
+	private Date insuranceExpiration;
 	@OneToOne()
-	private Endereco endereco;
+	private Endereco address;
 
 	@OneToOne(cascade = CascadeType.DETACH, orphanRemoval = true)
 	@JoinColumn(name = "id_usuario", nullable = false)
@@ -72,56 +72,36 @@ public class Paciente implements IEntity {
 		return consultas;
 	}
 
-	public String getConvenio() {
-		return convenio;
-	}
-
-	public void setConvenio(String convenio) {
-		this.convenio = convenio;
-	}
-
-	public void setConsultas(List<Consulta> consultas) {
-		this.consultas = consultas;
-	}
-
-	public List<Exame> getExames() {
-		return exames;
-	}
-
-	public void setExames(List<Exame> exames) {
-		this.exames = exames;
-	}
-
 	public long getId() {
 		return id;
 	}
 
 	public void setId(long id) {
-		id = id;
+		this.id = id;
 	}
 
-	public String getNome() {
-		return nome;
+	public String getName() {
+		return name;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getGenero() {
-		return genero;
+	public String getGender() {
+		return gender;
 	}
 
-	public void setGenero(String genero) {
-		this.genero = genero;
+	public void setGender(String gender) {
+		this.gender = gender;
 	}
 
-	public Date getDataNascimento() {
-		return dataNascimento;
+	public Date getBirthDate() {
+		return birthDate;
 	}
 
-	public void setDataNascimento(Date dataNascimento) {
-		this.dataNascimento = dataNascimento;
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
 	}
 
 	public String getCPF() {
@@ -140,20 +120,20 @@ public class Paciente implements IEntity {
 		RG = rG;
 	}
 
-	public String getEstadoCivil() {
-		return estadoCivil;
+	public String getMaritalStatus() {
+		return maritalStatus;
 	}
 
-	public void setEstadoCivil(String estadoCivil) {
-		this.estadoCivil = estadoCivil;
+	public void setMaritalStatus(String maritalStatus) {
+		this.maritalStatus = maritalStatus;
 	}
 
-	public String getTelefone() {
-		return telefone;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	public String getEmail() {
@@ -164,60 +144,68 @@ public class Paciente implements IEntity {
 		this.email = email;
 	}
 
-	public String getNaturalidade() {
-		return naturalidade;
+	public String getBirthCity() {
+		return birthCity;
 	}
 
-	public void setNaturalidade(String naturalidade) {
-		this.naturalidade = naturalidade;
+	public void setBirthCity(String birthCity) {
+		this.birthCity = birthCity;
 	}
 
-	public String getCttDeEmergencia() {
-		return cttDeEmergencia;
+	public String getEmergencyContact() {
+		return emergencyContact;
 	}
 
-	public void setCttDeEmergencia(String cttDeEmergencia) {
-		this.cttDeEmergencia = cttDeEmergencia;
+	public void setEmergencyContact(String emergencyContact) {
+		this.emergencyContact = emergencyContact;
 	}
 
-	public String getAlergias() {
-		return alergias;
+	public String getAllergies() {
+		return allergies;
 	}
 
-	public void setAlergias(String alergias) {
-		this.alergias = alergias;
+	public void setAllergies(String allergies) {
+		this.allergies = allergies;
 	}
 
-	public String getCuidadosEspecificos() {
-		return cuidadosEspecificos;
+	public String getSpecialCare() {
+		return specialCare;
 	}
 
-	public void setCuidadosEspecificos(String cuidadosEspecificos) {
-		this.cuidadosEspecificos = cuidadosEspecificos;
+	public void setSpecialCare(String specialCare) {
+		this.specialCare = specialCare;
 	}
 
-	public String getNumeroConvenio() {
-		return numeroConvenio;
+	public String getInsuranceCompany() {
+		return insuranceCompany;
 	}
 
-	public void setNumeroConvenio(String numeroConvenio) {
-		this.numeroConvenio = numeroConvenio;
+	public void setInsuranceCompany(String insuranceCompany) {
+		this.insuranceCompany = insuranceCompany;
 	}
 
-	public Date getValidadeConvenio() {
-		return validadeConvenio;
+	public String getInsuranceNumber() {
+		return insuranceNumber;
 	}
 
-	public void setValidadeConvenio(Date validadeConvenio) {
-		this.validadeConvenio = validadeConvenio;
+	public void setInsuranceNumber(String insuranceNumber) {
+		this.insuranceNumber = insuranceNumber;
 	}
 
-	public Endereco getEndereco() {
-		return endereco;
+	public Date getInsuranceExpiration() {
+		return insuranceExpiration;
 	}
 
-	public void setEndereco(Endereco endereco) {
-		this.endereco = endereco;
+	public void setInsuranceExpiration(Date insuranceExpiration) {
+		this.insuranceExpiration = insuranceExpiration;
+	}
+
+	public Endereco getAddress() {
+		return address;
+	}
+
+	public void setAddress(Endereco address) {
+		this.address = address;
 	}
 
 	public Usuario getUsuario() {
@@ -226,6 +214,18 @@ public class Paciente implements IEntity {
 
 	public void setUsuario(Usuario usuario) {
 		this.usuario = usuario;
+	}
+
+	public List<Exame> getExames() {
+		return exames;
+	}
+
+	public void setExames(List<Exame> exames) {
+		this.exames = exames;
+	}
+
+	public void setConsultas(List<Consulta> consultas) {
+		this.consultas = consultas;
 	}
 
 }

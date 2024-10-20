@@ -19,6 +19,8 @@ import br.com.pvv.senai.controller.filter.ProntuarioFilter;
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.entity.Exame;
 import br.com.pvv.senai.entity.Paciente;
+import br.com.pvv.senai.entity.Usuario;
+import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.exceptions.PacienteUserNotFoundException;
 import br.com.pvv.senai.model.Prontuario;
 import br.com.pvv.senai.model.ProntuarioDetails;
@@ -53,8 +55,17 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 
 	@Override
 	public ResponseEntity post(PacienteDto model) throws Exception {
-		if (!usuarioService.has(model.getEmail()))
-			throw new PacienteUserNotFoundException(model.getEmail());
+		if (!usuarioService.has(model.getEmail())) {
+			Usuario usuario = new Usuario();
+			usuario.setPerfil(Perfil.PACIENTE);
+			usuario.setEmail(model.getEmail());
+			usuario.setPassword(model.getCPF());
+			usuario.setNome(model.getName());
+			usuario.setTelefone(model.getPhone());
+			usuario.setDataNascimento(model.getBirthDate());
+			usuario.setCpf(model.getCPF());
+			usuarioService.create(usuario);
+		}
 		return ResponseEntity.status(201).body(service.create(model.makeEntity()));
 	}
 
@@ -67,7 +78,7 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 	public List<Prontuario> getProntuario(@RequestParam Map<String, String> params) {
 		var filter = new ProntuarioFilter(params);
 		var paged = service.paged(filter.example(), filter.getPagination());
-		var retorno = paged.map(x -> new Prontuario(x.getId(), x.getNome(), x.getConvenio())).toList();
+		var retorno = paged.map(x -> new Prontuario(x.getId(), x.getName(), x.getInsuranceCompany())).toList();
 		return retorno;
 	}
 
@@ -79,9 +90,9 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 
 		var retorno = new ProntuarioDetails();
 
-		retorno.setNome(paciente.getNome());
-		retorno.setCttDeEmergencia(paciente.getCttDeEmergencia());
-		retorno.setConvenio(paciente.getConvenio());
+		retorno.setNome(paciente.getName());
+		retorno.setCttDeEmergencia(paciente.getEmergencyContact());
+		retorno.setConvenio(paciente.getInsuranceCompany());
 
 		var exames = exameService.findByPacienteId(paciente.getId());
 		exames.sort(Comparator.comparing(Exame::getDataExame));
