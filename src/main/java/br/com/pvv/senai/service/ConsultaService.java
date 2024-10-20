@@ -25,22 +25,22 @@ public class ConsultaService extends GenericService<Consulta> {
 
 	@Override
 	public Consulta create(Consulta model) {
-		var paciente = pacienteService.findByEmail(model.getPaciente().getEmail()); // paciente já cadastrado - operação
-																					// DEVE ter sucesso.
-		model.setPaciente(paciente);
+		var paciente = pacienteService.findByEmail(model.getPatient().getEmail());
+
+		model.setPatient(paciente);
 		return super.create(model);
 	}
 
 	@Override
 	public Consulta alter(long id, Consulta model) {
-		var paciente = pacienteService.findByEmail(model.getPaciente().getEmail()); // paciente já cadastrado - operação
-																					// DEVE ter sucesso.
-		model.setPaciente(paciente);
+		var paciente = pacienteService.findByEmail(model.getPatient().getEmail());
+
+		model.setPatient(paciente);
 		return super.alter(id, model);
 	}
 
 	public List<Consulta> findByPacienteId(long id) {
-		return repository.findByPacienteId(id);
+		return repository.findByPatientId(id);
 	}
 
 	public long count() {

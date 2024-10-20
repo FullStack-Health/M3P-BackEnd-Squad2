@@ -10,5 +10,5 @@ import br.com.pvv.senai.entity.Consulta;
 
 @Repository
 public interface ConsultaRepository extends JpaRepository<Consulta, Long>, QueryByExampleExecutor<Consulta> {
-	List<Consulta> findByPacienteId(long id);
+	List<Consulta> findByPatientId(long id);
 }

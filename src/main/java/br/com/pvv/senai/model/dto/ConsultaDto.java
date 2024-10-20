@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import br.com.pvv.senai.entity.Consulta;
+import br.com.pvv.senai.model.dto.annotations.SkipMakeEntity;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -14,21 +15,26 @@ public class ConsultaDto extends GenericDto<Consulta> {
 	private long Id;
 	@NotNull
 	@Size(min = 8, max = 64)
-	private String motivoConsulta;
+	private String reason;
 	@NotNull
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate dataConsulta;
+	private LocalDate date;
 	@NotNull
 	@DateTimeFormat(pattern = "hh:mm:ss")
-	private LocalTime horaDaConsulta;
+	private LocalTime time;
 	@NotNull
 	@Size(min = 16, max = 1024)
-	private String descricaoDoProblema;
-	private String medicacaoReceitada;
+	private String issueDescription;
+	private String prescribedMedication;
 	@Size(min = 16, max = 256)
-	private String dosagemEPrecausoes;
+	private String observation;
+
+	@SkipMakeEntity
+	private PacienteDto patient;
+
 	@NotNull
-	private PacienteDto paciente;
+	@SkipMakeEntity
+	private int patientId;
 
 	@Override
 	protected Class<Consulta> getType() {
@@ -43,60 +49,68 @@ public class ConsultaDto extends GenericDto<Consulta> {
 		Id = id;
 	}
 
-	public String getMotivoConsulta() {
-		return motivoConsulta;
+	public String getReason() {
+		return reason;
 	}
 
-	public void setMotivoConsulta(String motivoConsulta) {
-		this.motivoConsulta = motivoConsulta;
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 
-	public LocalDate getDataConsulta() {
-		return dataConsulta;
+	public LocalDate getDate() {
+		return date;
 	}
 
-	public void setDataConsulta(LocalDate dataConsulta) {
-		this.dataConsulta = dataConsulta;
+	public void setDate(LocalDate date) {
+		this.date = date;
 	}
 
-	public LocalTime getHoraDaConsulta() {
-		return horaDaConsulta;
+	public LocalTime getTime() {
+		return time;
 	}
 
-	public void setHoraDaConsulta(LocalTime horaDaConsulta) {
-		this.horaDaConsulta = horaDaConsulta;
+	public void setTime(LocalTime time) {
+		this.time = time;
 	}
 
-	public String getDescricaoDoProblema() {
-		return descricaoDoProblema;
+	public String getIssueDescription() {
+		return issueDescription;
 	}
 
-	public void setDescricaoDoProblema(String descricaoDoProblema) {
-		this.descricaoDoProblema = descricaoDoProblema;
+	public void setIssueDescription(String issueDescription) {
+		this.issueDescription = issueDescription;
 	}
 
-	public String getMedicacaoReceitada() {
-		return medicacaoReceitada;
+	public String getPrescribedMedication() {
+		return prescribedMedication;
 	}
 
-	public void setMedicacaoReceitada(String medicacaoReceitada) {
-		this.medicacaoReceitada = medicacaoReceitada;
+	public void setPrescribedMedication(String prescribedMedication) {
+		this.prescribedMedication = prescribedMedication;
 	}
 
-	public String getDosagemEPrecausoes() {
-		return dosagemEPrecausoes;
+	public String getObservation() {
+		return observation;
 	}
 
-	public void setDosagemEPrecausoes(String dosagemEPrecausoes) {
-		this.dosagemEPrecausoes = dosagemEPrecausoes;
+	public void setObservation(String observation) {
+		this.observation = observation;
 	}
 
-	public PacienteDto getPaciente() {
-		return paciente;
+	public PacienteDto getPatient() {
+		return patient;
 	}
 
-	public void setPaciente(PacienteDto paciente) {
-		this.paciente = paciente;
+	public void setPatient(PacienteDto patient) {
+		this.patient = patient;
+	}
+
+	public int getPatientId() {
+		return patientId;
+	}
+
+	public void setPatientId(int patientId) {
+		this.patientId = patientId;
 	}
 
 }

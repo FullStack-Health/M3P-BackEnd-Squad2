@@ -98,7 +98,7 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 		exames.sort(Comparator.comparing(Exame::getDataExame));
 		retorno.setExames(exames);
 		var consultas = consultaService.findByPacienteId(paciente.getId());
-		consultas.sort(Comparator.comparing(Consulta::getDataConsulta));
+		consultas.sort(Comparator.comparing(Consulta::getDate));
 		retorno.setConsultas(consultas);
 
 		return ResponseEntity.ok(retorno);

@@ -23,6 +23,9 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 
 	@Autowired
 	private ConsultaService service;
+	
+	@Autowired
+	private PacienteService patientService;
 
 	@Override
 	public GenericService<Consulta> getService() {
@@ -32,6 +35,16 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 	@Override
 	public IFilter<Consulta> filterBuilder(Map<String, String> params) throws NotRequiredByProjectException {
 		throw new NotRequiredByProjectException();
+	}
+	
+	@Override
+	public ResponseEntity post(@Valid ConsultaDto model) throws DtoToEntityException, Exception {
+		var id = model.getPatientId();
+		var patient = patientService.get(id);
+		var entity = model.makeEntity();
+		entity.setPatient(patient);
+		entity = getService().create(entity);
+		return ResponseEntity.status(201).body(entity);
 	}
 
 }

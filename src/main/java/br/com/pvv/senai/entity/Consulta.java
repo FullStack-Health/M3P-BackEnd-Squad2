@@ -20,20 +20,20 @@ public class Consulta implements IEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long Id;
 	@Column(nullable = false)
-	private String motivoConsulta;
+	private String reason;
 	@Column(nullable = false)
-	private LocalDate dataConsulta;
+	private LocalDate date;
 	@Column(nullable = false)
-	private LocalTime horaDaConsulta;
+	private LocalTime time;
 	@Column(nullable = false, length = 1024)
-	private String descricaoDoProblema;
+	private String issueDescription;
 	@Column()
-	private String medicacaoReceitada;
-	@Column(length = 1024)
-	private String dosagemEPrecausoes;
+	private String prescribedMedication;
+	@Column(length = 256)
+	private String observation;
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
 	@JoinColumn(name = "id_paciente")
-	private Paciente paciente;
+	private Paciente patient;
 
 	public long getId() {
 		return Id;
@@ -43,60 +43,60 @@ public class Consulta implements IEntity {
 		Id = id;
 	}
 
-	public String getMotivoConsulta() {
-		return motivoConsulta;
+	public String getReason() {
+		return reason;
 	}
 
-	public void setMotivoConsulta(String motivoConsulta) {
-		this.motivoConsulta = motivoConsulta;
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 
-	public LocalDate getDataConsulta() {
-		return dataConsulta;
+	public LocalDate getDate() {
+		return date;
 	}
 
-	public void setDataConsulta(LocalDate dataConsulta) {
-		this.dataConsulta = dataConsulta;
+	public void setDate(LocalDate date) {
+		this.date = date;
 	}
 
-	public LocalTime getHoraDaConsulta() {
-		return horaDaConsulta;
+	public LocalTime getTime() {
+		return time;
 	}
 
-	public void setHoraDaConsulta(LocalTime horaDaConsulta) {
-		this.horaDaConsulta = horaDaConsulta;
+	public void setTime(LocalTime time) {
+		this.time = time;
 	}
 
-	public String getDescricaoDoProblema() {
-		return descricaoDoProblema;
+	public String getIssueDescription() {
+		return issueDescription;
 	}
 
-	public void setDescricaoDoProblema(String descricaoDoProblema) {
-		this.descricaoDoProblema = descricaoDoProblema;
+	public void setIssueDescription(String issueDescription) {
+		this.issueDescription = issueDescription;
 	}
 
-	public String getMedicacaoReceitada() {
-		return medicacaoReceitada;
+	public String getPrescribedMedication() {
+		return prescribedMedication;
 	}
 
-	public void setMedicacaoReceitada(String medicacaoReceitada) {
-		this.medicacaoReceitada = medicacaoReceitada;
+	public void setPrescribedMedication(String prescribedMedication) {
+		this.prescribedMedication = prescribedMedication;
 	}
 
-	public String getDosagemEPrecausoes() {
-		return dosagemEPrecausoes;
+	public String getObservation() {
+		return observation;
 	}
 
-	public void setDosagemEPrecausoes(String dosagemEPrecausoes) {
-		this.dosagemEPrecausoes = dosagemEPrecausoes;
+	public void setObservation(String observation) {
+		this.observation = observation;
 	}
 
-	public Paciente getPaciente() {
-		return paciente;
+	public Paciente getPatient() {
+		return patient;
 	}
 
-	public void setPaciente(Paciente paciente) {
-		this.paciente = paciente;
+	public void setPatient(Paciente patient) {
+		this.patient = patient;
 	}
 
 }
