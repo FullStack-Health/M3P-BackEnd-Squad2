@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,15 +56,16 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 
 	@Override
 	public ResponseEntity post(PacienteDto model) throws Exception {
+		String cpfLimpo = model.getCPF().replaceAll("[^\\d]", "");
 		if (!usuarioService.has(model.getEmail())) {
 			Usuario usuario = new Usuario();
 			usuario.setPerfil(Perfil.PACIENTE);
 			usuario.setEmail(model.getEmail());
-			usuario.setPassword(model.getCPF());
+			usuario.setPassword( new BCryptPasswordEncoder().encode(cpfLimpo));
 			usuario.setNome(model.getName());
 			usuario.setTelefone(model.getPhone());
 			usuario.setDataNascimento(model.getBirthDate());
-			usuario.setCpf(model.getCPF());
+			usuario.setCpf(cpfLimpo);
 			usuarioService.create(usuario);
 		}
 		return ResponseEntity.status(201).body(service.create(model.makeEntity()));
