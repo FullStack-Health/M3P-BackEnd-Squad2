@@ -1,8 +1,9 @@
 package br.com.pvv.senai.security;
 
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-
+import br.com.pvv.senai.enums.Perfil;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,11 +24,8 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-
-import br.com.pvv.senai.enums.Perfil;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 
 @Configuration
 @EnableWebSecurity
@@ -63,7 +61,8 @@ public class SecurityConfig {
 //								"/consultas/{id}", //
 //								"/pacientes/{id}")
 //						.hasAuthority(Perfil.ADMIN.scope())//
-//						.requestMatchers(HttpMethod.GET, //
+						.requestMatchers(HttpMethod.GET, //
+								"/usuarios/{id}"
 //								"/dashboard**", //
 //								"/pacientes/{id}/prontuarios", //
 //								"/pacientes/prontuarios", //
@@ -71,7 +70,7 @@ public class SecurityConfig {
 ////								"/consultas/{id}", //
 //								"/pacientes"// , //
 ////								"/pacientes/{id}" //
-//						).hasAuthority(Perfil.ADMIN.scope())
+						).hasAuthority(Perfil.ADMIN.scope())
 						// MEDICO
 						.requestMatchers(HttpMethod.POST, //
 								"/exames", //
