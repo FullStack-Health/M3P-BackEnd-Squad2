@@ -65,11 +65,12 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 	public ResponseEntity<Usuario> register(@RequestBody @Valid UsuarioDtoMinimal model)
 			throws MethodArgumentNotValidException, DtoToEntityException, BadRequestException,
 			EmailViolationExistentException {
-		if (model.getPerfil() != Perfil.MEDICO && model.getPerfil() != Perfil.ADMIN)
-			throw new BadRequestException("Perfil não autorizado.");
+//		if (model.getPerfil() != Perfil.MEDICO && model.getPerfil() != Perfil.ADMIN)
+//			throw new BadRequestException("Perfil não autorizado.");
 
 		var entity = model.makeEntity();
 		entity.setPassword(new BCryptPasswordEncoder().encode(model.getPassword()));
+		entity.setPerfil(model.getPerfil());
 		try {
 			entity = service.create(entity);
 		} catch (DataIntegrityViolationException ex) {

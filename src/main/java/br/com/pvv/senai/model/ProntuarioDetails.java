@@ -7,18 +7,18 @@ import br.com.pvv.senai.entity.Exame;
 
 public class ProntuarioDetails {
 
-	private String nome;
+	private String name;
 	private String convenio;
 	private String cttDeEmergencia;
 	private List<Exame> exames;
 	private List<Consulta> consultas;
 
-	public String getNome() {
-		return nome;
+	public String getName() {
+		return name;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setName(String nome) {
+		this.name = name;
 	}
 
 	public String getConvenio() {

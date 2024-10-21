@@ -21,6 +21,7 @@ public class UsuarioDtoMinimal extends GenericDto<Usuario> {
 	@NotNull
 	@Size(max = 255)
 	private String password;
+
 	private Perfil perfil;
 
 	public long getId() {

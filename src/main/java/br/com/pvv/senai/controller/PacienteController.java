@@ -78,7 +78,7 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 	public List<Prontuario> getProntuario(@RequestParam Map<String, String> params) {
 		var filter = new ProntuarioFilter(params);
 		var paged = service.paged(filter.example(), filter.getPagination());
-		var retorno = paged.map(x -> new Prontuario(x.getId(), x.getName(), x.getInsuranceCompany())).toList();
+		var retorno = paged.map(x -> new Prontuario(x.getId(), x.getName(), x.getInsuranceCompany(),x.getPhone())).toList();
 		return retorno;
 	}
 
@@ -90,7 +90,7 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 
 		var retorno = new ProntuarioDetails();
 
-		retorno.setNome(paciente.getName());
+		retorno.setName(paciente.getName());
 		retorno.setCttDeEmergencia(paciente.getEmergencyContact());
 		retorno.setConvenio(paciente.getInsuranceCompany());
 

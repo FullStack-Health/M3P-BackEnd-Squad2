@@ -2,39 +2,49 @@ package br.com.pvv.senai.model;
 
 public class Prontuario {
 
-	private long numeroRegistro;
-	private String nome;
-	private String convenio;
+	private long id;
+	private String name;
+	private String insuranceCompany;
 
-	public Prontuario(long numeroRegistro, String nome, String convenio) {
+	private String phone;
+
+	public Prontuario(long id, String name, String insuranceCompany, String phone) {
 		super();
-		this.numeroRegistro = numeroRegistro;
-		this.nome = nome;
-		this.convenio = convenio;
+		this.id = id;
+		this.name = name;
+		this.insuranceCompany = insuranceCompany;
+		this.phone = phone;
 	}
 
-	public long getNumeroRegistro() {
-		return numeroRegistro;
+	public long getId() {
+		return id;
 	}
 
-	public void setNumeroRegistro(long numeroRegistro) {
-		this.numeroRegistro = numeroRegistro;
+	public void setId(long id) {
+		this.id = id;
 	}
 
-	public String getNome() {
-		return nome;
+	public String getName() {
+		return name;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getConvenio() {
-		return convenio;
+	public String getInsuranceCompany() {
+		return insuranceCompany;
 	}
 
-	public void setConvenio(String convenio) {
-		this.convenio = convenio;
+	public void setinsuranceCompany(String insuranceCompany) {
+		this.insuranceCompany = insuranceCompany;
 	}
 
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 }

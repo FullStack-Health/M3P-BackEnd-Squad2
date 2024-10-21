@@ -11,13 +11,13 @@ import br.com.pvv.senai.entity.Paciente;
 
 public class ProntuarioFilter implements IFilter<Paciente> {
 
-	private String nome;
+	private String name;
 	private String numeroRegistro;
 	private int pageSize;
 	private int pageNumber;
 
 	public ProntuarioFilter(Map<String, String> params) {
-		this.setNome(params.get("nome"));
+		this.setName(params.get("name"));
 		this.setNumeroRegistro(params.get("numeroRegistro"));
 		this.setPageNumber(params.get("pageNumber") != null ? Integer.parseInt(params.get("pageNumber")) : 0);
 		this.setPageSize(params.get("pageSize") != null ? Integer.parseInt(params.get("pageSize")) : 10);
@@ -27,15 +27,15 @@ public class ProntuarioFilter implements IFilter<Paciente> {
 	public Example<Paciente> example() {
 
 		ExampleMatcher matcher = ExampleMatcher.matchingAny()
-				.withMatcher("nome", match -> match.contains().ignoreCase())
+				.withMatcher("name", match -> match.contains().ignoreCase())
 				.withMatcher("numeroRegistro", match -> match.exact()) //
 				.withIgnorePaths("id") //
 				.withIgnoreNullValues();
 
 		Paciente paciente = new Paciente();
 
-		if (this.getNome() != null)
-			paciente.setName(this.getNome());
+		if (this.getName() != null)
+			paciente.setName(this.getName());
 		if (this.getNumeroRegistro() != null)
 			paciente.setId(Integer.valueOf(this.getNumeroRegistro()));
 
@@ -47,12 +47,12 @@ public class ProntuarioFilter implements IFilter<Paciente> {
 		return PageRequest.of(this.pageNumber, this.pageSize);
 	}
 
-	public String getNome() {
-		return nome;
+	public String getName() {
+		return name;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getNumeroRegistro() {
