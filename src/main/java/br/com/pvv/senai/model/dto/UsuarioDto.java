@@ -1,15 +1,14 @@
 package br.com.pvv.senai.model.dto;
 
-import java.util.Date;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 
 public class UsuarioDto extends GenericDto<Usuario> {
 
@@ -32,6 +31,7 @@ public class UsuarioDto extends GenericDto<Usuario> {
 	@NotNull
 	@Size(max = 255)
 	private String password;
+	@NotNull
 	private Perfil perfil;
 
 	public String getTelefone() {
