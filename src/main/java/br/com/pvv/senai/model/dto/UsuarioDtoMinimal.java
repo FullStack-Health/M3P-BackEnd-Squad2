@@ -1,13 +1,11 @@
 package br.com.pvv.senai.model.dto;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.util.Date;
 
 public class UsuarioDtoMinimal extends GenericDto<Usuario> {
 
@@ -21,6 +19,7 @@ public class UsuarioDtoMinimal extends GenericDto<Usuario> {
 	@NotNull
 	@Size(max = 255)
 	private String password;
+	@NotNull
 	private Perfil perfil;
 
 	public long getId() {
