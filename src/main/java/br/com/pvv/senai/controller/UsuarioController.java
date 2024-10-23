@@ -9,6 +9,7 @@ import br.com.pvv.senai.model.dto.UsuarioDto;
 import br.com.pvv.senai.model.dto.UsuarioDtoMinimal;
 import br.com.pvv.senai.security.UsuarioService;
 import br.com.pvv.senai.service.GenericService;
+import br.com.pvv.senai.utils.SenhaUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -57,6 +58,7 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 			throw new BadRequestException("Perfil não autorizado.");
 
 		var entity = model.makeEntity();
+		entity.setSenhaMascarada(SenhaUtils.gerarSenhaMascarada(model.getPassword()));
 		entity.setPassword(new BCryptPasswordEncoder().encode(model.getPassword()));
 		try {
 			entity = service.create(entity);
