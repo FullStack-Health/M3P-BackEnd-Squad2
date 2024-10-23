@@ -107,7 +107,7 @@ public class SecurityConfig {
 								"/consultas/{id}", //
 								"/exames/{id}")
 						.hasAuthority(Perfil.PACIENTE.scope())
-						// QUEST
+						// GUEST
 						.requestMatchers(
 								"/login",
 								"/usuarios/pre-registro",
