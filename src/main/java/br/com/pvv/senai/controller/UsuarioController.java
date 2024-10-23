@@ -99,8 +99,8 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 	}
 
 	@Override
-	public ResponseEntity<Usuario> get(
-			@PathVariable(name = "id") Long id) {
+	public ResponseEntity<Usuario> get(@PathVariable(name = "id") Long id)
+			throws UsuarioNotFoundException, NotAuthorizedException {
 		var usuario = service.get(id);
 		if (usuario == null) {
 			throw new UsuarioNotFoundException();
@@ -110,6 +110,5 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 		}
 		return ResponseEntity.ok(usuario);
 	}
-
 
 }

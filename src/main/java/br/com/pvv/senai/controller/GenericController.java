@@ -38,7 +38,7 @@ public abstract class GenericController<U extends GenericDto<T>, T extends IEnti
 	}
 
 	@GetMapping("{id}")
-	public ResponseEntity get(@PathVariable Long id) {
+	public ResponseEntity get(@PathVariable Long id) throws Exception {
 		var retorno = getService().get(id);
 		if (retorno == null)
 			return ResponseEntity.notFound().build();
