@@ -46,7 +46,7 @@ public abstract class GenericController<U extends GenericDto<T>, T extends IEnti
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity put(@PathVariable long id, @Valid @RequestBody U model) throws DtoToEntityException {
+	public ResponseEntity put(@PathVariable Long id, @Valid @RequestBody U model) throws DtoToEntityException {
 		if (getService().get(id) == null)
 			ResponseEntity.notFound().build();
 		getService().alter(model.getId(), model.makeEntity());

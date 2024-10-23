@@ -113,5 +113,28 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 		return ResponseEntity.ok(usuario);
 	}
 
+	@Override
+	public ResponseEntity<Usuario> put(
+			@PathVariable(name = "id") Long id,
+			@Valid @RequestBody UsuarioDto model) {
+		if (getService().get(id) == null) {
+			return ResponseEntity.notFound().build();
+		}
+		if (getService().get(id).getPerfil() == Perfil.PACIENTE) {
+			throw new NotAuthorizedException();
+		}
+		Usuario usuario = model.makeEntity();
+		usuario.setSenhaMascarada(SenhaUtils.gerarSenhaMascarada(model.getPassword()));
+		usuario.setPassword(new BCryptPasswordEncoder().encode(model.getPassword()));
+		Usuario usuarioAtualizado;
+		try {
+			usuarioAtualizado = getService().alter(id, usuario);
+		} catch(DataIntegrityViolationException ex) {
+			throw new EmailViolationExistentException();
+		}
+		return ResponseEntity.ok(usuarioAtualizado);
+	}
+
+
 
 }

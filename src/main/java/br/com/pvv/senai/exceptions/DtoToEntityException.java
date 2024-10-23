@@ -3,7 +3,7 @@ package br.com.pvv.senai.exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DtoToEntityException extends Exception {
+public class DtoToEntityException extends RuntimeException {
 
 	Logger log = LoggerFactory.getLogger(DtoToEntityException.class);
 
