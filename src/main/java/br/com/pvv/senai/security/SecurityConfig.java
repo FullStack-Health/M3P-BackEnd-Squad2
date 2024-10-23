@@ -51,11 +51,12 @@ public class SecurityConfig {
 //								"/pacientes" // , //
 								"/usuarios" //
 						).hasAuthority(Perfil.ADMIN.scope())//
-//						.requestMatchers(HttpMethod.PUT, //
-//								"/exames/{id}", //
-//								"/consultas/{id}", //
-//								"/pacientes/{id}")
-//						.hasAuthority(Perfil.ADMIN.scope())//
+						.requestMatchers(HttpMethod.PUT, //
+								"/exames/{id}",
+								"/consultas/{id}",
+								"/pacientes/{id}",
+								"/usuarios/{id}")
+						.hasAuthority(Perfil.ADMIN.scope())//
 						.requestMatchers(HttpMethod.DELETE,
 								"/exames/{id}",
 								"/consultas/{id}",
