@@ -73,10 +73,11 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 	public ResponseEntity post(@Valid UsuarioDto model) throws DtoToEntityException, NotAuthorizedException, Exception {
 		if (model.getPerfil() == Perfil.PACIENTE)
 			throw new NotAuthorizedException();
-
-		model.setPassword(new BCryptPasswordEncoder().encode(model.getPassword()));
-
-		return super.post(model);
+		var entity = model.makeEntity();
+		entity.setPassword(new BCryptPasswordEncoder().encode(model.getPassword()));
+		entity.setSenhaMascarada(SenhaUtils.gerarSenhaMascarada(model.getPassword()));
+		entity = getService().create(entity);
+		return ResponseEntity.status(201).body(entity);
 	}
 
 	@PutMapping("email/{email}/redefinir-senha")
