@@ -1,0 +1,1 @@
+INSERT INTO "usuario" ("perfil", "data_nascimento", "cpf", "email", "nome", "password") VALUES ('1', '2000-08-12', '12345678910', 'teste@teste.com', 'Usuário de Testes', '$2a$12$kn9RMO2pcOCYONZcQES2ROLfduIPWsHBnPNF1eyDacCR1VegYs7ku');
