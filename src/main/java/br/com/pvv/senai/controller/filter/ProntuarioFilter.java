@@ -11,14 +11,14 @@ import br.com.pvv.senai.entity.Paciente;
 
 public class ProntuarioFilter implements IFilter<Paciente> {
 
-	private String nome;
-	private String numeroRegistro;
+	private String name;
+	private String id;
 	private int pageSize;
 	private int pageNumber;
 
 	public ProntuarioFilter(Map<String, String> params) {
-		this.setNome(params.get("nome"));
-		this.setNumeroRegistro(params.get("numeroRegistro"));
+		this.setName(params.get("name"));
+		this.setId(params.get("id"));
 		this.setPageNumber(params.get("pageNumber") != null ? Integer.parseInt(params.get("pageNumber")) : 0);
 		this.setPageSize(params.get("pageSize") != null ? Integer.parseInt(params.get("pageSize")) : 10);
 	}
@@ -27,19 +27,28 @@ public class ProntuarioFilter implements IFilter<Paciente> {
 	public Example<Paciente> example() {
 
 		ExampleMatcher matcher = ExampleMatcher.matchingAny()
-				.withMatcher("nome", match -> match.contains().ignoreCase())
-				.withMatcher("numeroRegistro", match -> match.exact()) //
-				.withIgnorePaths("id") //
-				.withIgnoreNullValues();
+				.withMatcher("name", match -> match.contains().ignoreCase());
+//				.withMatcher("id", match -> match.exact()) //
+//				.withIgnorePaths("id") //
+//				.withIgnoreNullValues();
 
 		Paciente paciente = new Paciente();
 
-		if (this.getNome() != null)
-			paciente.setName(this.getNome());
-		if (this.getNumeroRegistro() != null)
-			paciente.setId(Integer.valueOf(this.getNumeroRegistro()));
+		if (this.getName() != null)
+			paciente.setName(this.getName());
+		if (this.getName() != null && !this.getName().isEmpty()) {
+			paciente.setName(this.getName());
+		} else {
+			matcher = matcher.withIgnorePaths("name");
+		}
 
-		return Example.of(paciente, matcher);
+		if (this.getId() != null) {
+			paciente.setId(Long.valueOf(this.getId()));
+		} else {
+			matcher = matcher.withIgnorePaths("id");
+		}
+
+			return Example.of(paciente, matcher);
 	}
 
 	@Override
@@ -47,21 +56,24 @@ public class ProntuarioFilter implements IFilter<Paciente> {
 		return PageRequest.of(this.pageNumber, this.pageSize);
 	}
 
-	public String getNome() {
-		return nome;
+	public String getName() {
+		return name;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getNumeroRegistro() {
-		return numeroRegistro;
+
+	public String getId() {
+		return id;
 	}
 
-	public void setNumeroRegistro(String numeroRegistro) {
-		this.numeroRegistro = numeroRegistro;
+	public void setId(String id) {
+		this.id = id;
 	}
+
+
 
 	public int getPageSize() {
 		return pageSize;
