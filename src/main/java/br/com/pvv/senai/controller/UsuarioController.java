@@ -1,36 +1,10 @@
 package br.com.pvv.senai.controller;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.controller.filter.UsuarioFilter;
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.exceptions.DtoToEntityException;
-import br.com.pvv.senai.exceptions.EmailViolationExistentException;
-import br.com.pvv.senai.exceptions.NotAuthorizedException;
-import br.com.pvv.senai.exceptions.UnauthorizationException;
-import br.com.pvv.senai.exceptions.UsuarioNotFoundException;
+import br.com.pvv.senai.exceptions.*;
 import br.com.pvv.senai.model.dto.UsuarioDto;
 import br.com.pvv.senai.model.dto.UsuarioDtoMinimal;
 import br.com.pvv.senai.security.UsuarioService;
@@ -41,25 +15,38 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.apache.coyote.BadRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/usuarios")
-public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
+public class UsuarioController {
 
 	@Autowired
 	private UsuarioService service;
 
-	@Override
 	public GenericService<Usuario> getService() {
 		return service;
 	}
 
-	@Override
 	public IFilter<Usuario> filterBuilder(Map<String, String> params) throws Exception {
 		return new UsuarioFilter(params);
 	}
 
-	@Override
+	@GetMapping
 	public ResponseEntity<Page<Usuario>> list(Map<String, String> params) throws Exception {
 		var in_list = getService().all();
 		var filter = filterBuilder(params);
@@ -109,8 +96,8 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 		return ResponseEntity.status(201).body(entity);
 	}
 
-	@Override
-	public ResponseEntity post(@Valid UsuarioDto model) throws DtoToEntityException, NotAuthorizedException, Exception {
+	@PostMapping
+	public ResponseEntity post(@Valid @RequestBody UsuarioDto model) throws DtoToEntityException, NotAuthorizedException, Exception {
 		if (model.getPerfil() == Perfil.PACIENTE)
 			throw new NotAuthorizedException();
 		var entity = model.makeEntity();
@@ -141,7 +128,7 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 		return ResponseEntity.noContent().build();
 	}
 
-	@Override
+	@GetMapping("{id}")
 	public ResponseEntity<Usuario> get(@PathVariable(name = "id") Long id) {
 		var usuario = service.get(id);
 		if (usuario == null) {
@@ -153,14 +140,7 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 		return ResponseEntity.ok(usuario);
 	}
 
-//	@Override
-//	public ResponseEntity<Page<Usuario>> list(Map<String, String> params) throws Exception {
-//		var pagined = super.list(params);
-//		pagined.getBody().getContent().forEach(u -> u.setSenhaMascarada(SenhaUtils.gerarSenhaMascarada(u.getPassword())));
-//		return pagined;
-//	}
-
-	@Override
+	@PutMapping("{id}")
 	public ResponseEntity<Usuario> put(@PathVariable(name = "id") Long id, @Valid @RequestBody UsuarioDto model) {
 		if (getService().get(id) == null) {
 			return ResponseEntity.notFound().build();
@@ -178,6 +158,13 @@ public class UsuarioController extends GenericController<UsuarioDto, Usuario> {
 			throw new EmailViolationExistentException();
 		}
 		return ResponseEntity.ok(usuarioAtualizado);
+	}
+
+	@DeleteMapping("{id}")
+	public ResponseEntity delete(@PathVariable Long id) {
+		if (getService().delete(id))
+			return ResponseEntity.noContent().build();
+		return ResponseEntity.notFound().build();
 	}
 
 }
