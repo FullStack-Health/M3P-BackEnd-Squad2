@@ -7,6 +7,7 @@ import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.exceptions.*;
 import br.com.pvv.senai.model.dto.UsuarioDto;
 import br.com.pvv.senai.model.dto.UsuarioDtoMinimal;
+import br.com.pvv.senai.model.dto.UsuarioUpdateDto;
 import br.com.pvv.senai.security.UsuarioService;
 import br.com.pvv.senai.service.GenericService;
 import br.com.pvv.senai.utils.SenhaUtils;
@@ -103,7 +104,11 @@ public class UsuarioController {
 		var entity = model.makeEntity();
 		entity.setPassword(new BCryptPasswordEncoder().encode(model.getPassword()));
 		entity.setSenhaMascarada(SenhaUtils.gerarSenhaMascarada(model.getPassword()));
-		entity = getService().create(entity);
+		try {
+			entity = service.create(entity);
+		} catch (DataIntegrityViolationException ex) {
+			throw new EmailViolationExistentException();
+		}
 		return ResponseEntity.status(201).body(entity);
 	}
 
@@ -141,23 +146,22 @@ public class UsuarioController {
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<Usuario> put(@PathVariable(name = "id") Long id, @Valid @RequestBody UsuarioDto model) {
+	public ResponseEntity<Usuario> put(@PathVariable(name = "id") Long id, @Valid @RequestBody UsuarioUpdateDto model) {
+		Usuario usuarioExistente = getService().get(id);
 		if (getService().get(id) == null) {
 			return ResponseEntity.notFound().build();
 		}
-		if (getService().get(id).getPerfil() == Perfil.PACIENTE) {
-			throw new NotAuthorizedException();
-		}
-		Usuario usuario = model.makeEntity();
-		usuario.setSenhaMascarada(SenhaUtils.gerarSenhaMascarada(model.getPassword()));
-		usuario.setPassword(new BCryptPasswordEncoder().encode(model.getPassword()));
-		Usuario usuarioAtualizado;
+		Usuario usuarioAtualizado = model.makeEntity();
+		usuarioAtualizado.setPerfil(usuarioExistente.getPerfil());
+		usuarioAtualizado.setPassword(usuarioExistente.getPassword());
+		usuarioAtualizado.setSenhaMascarada(usuarioExistente.getSenhaMascarada());
+		Usuario usuarioSalvo;
 		try {
-			usuarioAtualizado = getService().alter(id, usuario);
+			usuarioSalvo = getService().alter(id, usuarioAtualizado);
 		} catch (DataIntegrityViolationException ex) {
 			throw new EmailViolationExistentException();
 		}
-		return ResponseEntity.ok(usuarioAtualizado);
+		return ResponseEntity.ok(usuarioSalvo);
 	}
 
 	@DeleteMapping("{id}")
