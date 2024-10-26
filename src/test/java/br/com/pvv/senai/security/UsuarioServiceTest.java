@@ -136,6 +136,17 @@ class UsuarioServiceTest {
         verify(userRepository).delete(usuario);
     }
 
+    @Test
+    @DisplayName("Deve retornar quantidade de pessoas usuárias no repositório")
+    void count(){
+        // Given
+        when(userRepository.count()).thenReturn(1L);
+        // When
+        Long quantidade = usuarioService.count();
+        // Then
+        assertEquals(1L, quantidade);
+        verify(userRepository).count();
+    }
 
 
 }
