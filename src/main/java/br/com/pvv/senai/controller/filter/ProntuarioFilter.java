@@ -46,10 +46,10 @@ public class ProntuarioFilter implements IFilter<Paciente> {
 			paciente.setId(Long.valueOf(this.getId()));
 		} else {
 			matcher = matcher.withIgnorePaths("id");
-		}
 
-			return Example.of(paciente, matcher);
-	}
+		}
+			return Example.of(paciente, matcher); }
+
 
 	@Override
 	public Pageable getPagination() {
