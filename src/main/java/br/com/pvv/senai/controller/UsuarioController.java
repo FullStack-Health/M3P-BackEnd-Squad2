@@ -1,10 +1,38 @@
 package br.com.pvv.senai.controller;
 
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.coyote.BadRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.controller.filter.UsuarioFilter;
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.exceptions.*;
+import br.com.pvv.senai.exceptions.DtoToEntityException;
+import br.com.pvv.senai.exceptions.EmailViolationExistentException;
+import br.com.pvv.senai.exceptions.NotAuthorizedException;
+import br.com.pvv.senai.exceptions.UnauthorizationException;
+import br.com.pvv.senai.exceptions.UsuarioNotFoundException;
 import br.com.pvv.senai.model.dto.UsuarioDto;
 import br.com.pvv.senai.model.dto.UsuarioDtoMinimal;
 import br.com.pvv.senai.model.dto.UsuarioUpdateDto;
@@ -16,21 +44,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -48,28 +61,24 @@ public class UsuarioController {
 	}
 
 	@GetMapping
-	public ResponseEntity<Page<Usuario>> list(Map<String, String> params) throws Exception {
-		var in_list = getService().all();
-		var filter = filterBuilder(params);
-		var pag = filter.getPagination();
-		ArrayList<Usuario> list = new ArrayList<>();
-		for (var user : in_list)
-			if (user.getPerfil() != Perfil.PACIENTE)
-				list.add(user);
-
-		var from = pag.getPageNumber() * pag.getPageSize();
-		var to = (1 + pag.getPageNumber()) * pag.getPageSize();
-		List<Usuario> sublist;
-		if (to < list.size())
-			sublist = list.subList(from, to);
-		else if (from == 0)
-			sublist = list;
-		else
-			sublist = new ArrayList<>();
-		
-		PageImpl<Usuario> paged = new PageImpl<>(sublist, pag, list.size());
-		
-		return ResponseEntity.ok(paged);
+	public ResponseEntity<Page<Usuario>> list(@RequestParam Map<String, String> params) throws Exception {
+		if (params.size() != 0) {
+			var filter = this.filterBuilder(params);
+			var list = service.paged(filter.example(), filter.getPagination());
+			if (list.hasContent())
+				return ResponseEntity.ok(list);
+		} else {
+			var full_list = getService().all();
+			List<Usuario> list = new ArrayList<>();
+			if (full_list.size() > 0) {
+				for (var user : full_list)
+					if (user.getPerfil() != Perfil.PACIENTE)
+						list.add(user);
+				PageImpl<Usuario> p = new PageImpl<Usuario>(list);
+				return ResponseEntity.ok(p);
+			}
+		}
+		return ResponseEntity.notFound().build();
 	}
 
 	@GetMapping("/me")
@@ -98,7 +107,8 @@ public class UsuarioController {
 	}
 
 	@PostMapping
-	public ResponseEntity post(@Valid @RequestBody UsuarioDto model) throws DtoToEntityException, NotAuthorizedException, Exception {
+	public ResponseEntity post(@Valid @RequestBody UsuarioDto model)
+			throws DtoToEntityException, NotAuthorizedException, Exception {
 		if (model.getPerfil() == Perfil.PACIENTE)
 			throw new NotAuthorizedException();
 		var entity = model.makeEntity();

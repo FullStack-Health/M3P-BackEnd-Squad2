@@ -2,9 +2,12 @@ package br.com.pvv.senai.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.pvv.senai.entity.Paciente;
+import br.com.pvv.senai.entity.Usuario;
+import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.repository.PacienteRepository;
 import br.com.pvv.senai.security.UsuarioService;
 
@@ -42,8 +45,19 @@ public class PacienteService extends GenericService<Paciente> {
 		if (endereco != null && endereco.getId() == 0)
 			endereco = this.enderecoService.create(model.getAddress());
 		var usuario = this.userService.findByEmail(model.getEmail()).get();
+		
+		String cpfLimpo = model.getCPF().replaceAll("[^\\d]", "");
+		usuario.setPerfil(Perfil.PACIENTE);
+		usuario.setEmail(model.getEmail());
+		usuario.setPassword( new BCryptPasswordEncoder().encode(cpfLimpo));
+		usuario.setNome(model.getName());
+		usuario.setTelefone(model.getPhone());
+		usuario.setDataNascimento(model.getBirthDate());
+		usuario.setCpf(cpfLimpo);
+		userService.alter(usuario.getId(), usuario);
 		model.setUsuario(usuario);
-		var retorno = super.create(model);
+		
+		var retorno = super.alter(id ,model);
 //		usuario.setPassword(null); -> applied @JsonIgnore
 		return retorno;
 	}

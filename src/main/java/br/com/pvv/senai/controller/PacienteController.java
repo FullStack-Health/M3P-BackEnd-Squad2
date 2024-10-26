@@ -4,12 +4,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +25,8 @@ import br.com.pvv.senai.entity.Exame;
 import br.com.pvv.senai.entity.Paciente;
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.exceptions.PacienteUserNotFoundException;
 import br.com.pvv.senai.model.Prontuario;
+import br.com.pvv.senai.model.dto.ProntuarioDto;
 import br.com.pvv.senai.model.ProntuarioDetails;
 import br.com.pvv.senai.model.dto.PacienteDto;
 import br.com.pvv.senai.security.UsuarioService;
@@ -31,6 +34,8 @@ import br.com.pvv.senai.service.ConsultaService;
 import br.com.pvv.senai.service.ExameService;
 import br.com.pvv.senai.service.GenericService;
 import br.com.pvv.senai.service.PacienteService;
+import br.com.pvv.senai.utils.SenhaUtils;
+import jakarta.validation.Valid;
 
 @Controller
 @RestController
@@ -55,13 +60,14 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 	}
 
 	@Override
-	public ResponseEntity post(PacienteDto model) throws Exception {
+	public ResponseEntity post(@RequestBody @Valid PacienteDto model) throws Exception {
 		String cpfLimpo = model.getCPF().replaceAll("[^\\d]", "");
 		if (!usuarioService.has(model.getEmail())) {
 			Usuario usuario = new Usuario();
 			usuario.setPerfil(Perfil.PACIENTE);
 			usuario.setEmail(model.getEmail());
 			usuario.setPassword( new BCryptPasswordEncoder().encode(cpfLimpo));
+			usuario.setSenhaMascarada(SenhaUtils.gerarSenhaMascarada(cpfLimpo));
 			usuario.setNome(model.getName());
 			usuario.setTelefone(model.getPhone());
 			usuario.setDataNascimento(model.getBirthDate());
@@ -76,32 +82,60 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 		return new PacienteFilter(params);
 	}
 
+//	@GetMapping("prontuarios")
+//	public List<Prontuario> getProntuario(@RequestParam Map<String, String> params) {
+//		var filter = new ProntuarioFilter(params);
+//		var paged = service.paged(filter.example(), filter.getPagination());
+//		var retorno = paged.map(x -> new Prontuario(x.getId(), x.getName(), x.getInsuranceCompany())).toList();
+//		return retorno;
+//	}
+
+
 	@GetMapping("prontuarios")
-	public List<Prontuario> getProntuario(@RequestParam Map<String, String> params) {
+	public ResponseEntity<List<ProntuarioDto>> getProntuario(
+			@RequestParam(required = false) String nome,
+			@RequestParam(required = false) Long id,
+			@RequestParam Map<String, String> params) {
 		var filter = new ProntuarioFilter(params);
 		var paged = service.paged(filter.example(), filter.getPagination());
-		var retorno = paged.map(x -> new Prontuario(x.getId(), x.getName(), x.getInsuranceCompany())).toList();
-		return retorno;
+		var retorno = paged.map(paciente -> new ProntuarioDto(
+				paciente,
+				exameService.findByPacienteId(paciente.getId()),
+				consultaService.findByPacienteId(paciente.getId())
+		)).toList();
+
+		if (retorno.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		return ResponseEntity.ok(retorno);
+
 	}
 
-	@GetMapping("{id}/prontuarios")
+
+		@GetMapping("{id}/prontuarios")
 	public ResponseEntity getProntuarioDetails(@PathVariable long id) {
 		Paciente paciente = service.get(id);
 		if (paciente == null)
 			return ResponseEntity.notFound().build();
 
-		var retorno = new ProntuarioDetails();
+//		var retorno = new ProntuarioDetails();
 
-		retorno.setNome(paciente.getName());
-		retorno.setCttDeEmergencia(paciente.getEmergencyContact());
-		retorno.setConvenio(paciente.getInsuranceCompany());
-
+//		retorno.setNome(paciente.getName());
+//		retorno.setCttDeEmergencia(paciente.getEmergencyContact());
+//		retorno.setConvenio(paciente.getInsuranceCompany());
+//
 		var exames = exameService.findByPacienteId(paciente.getId());
 		exames.sort(Comparator.comparing(Exame::getDataExame));
-		retorno.setExames(exames);
+
 		var consultas = consultaService.findByPacienteId(paciente.getId());
 		consultas.sort(Comparator.comparing(Consulta::getDate));
+
+		ProntuarioDto retorno = new ProntuarioDto(paciente, exames, consultas);
+		retorno.setExames(exames);
 		retorno.setConsultas(consultas);
+
+
 
 		return ResponseEntity.ok(retorno);
 	}

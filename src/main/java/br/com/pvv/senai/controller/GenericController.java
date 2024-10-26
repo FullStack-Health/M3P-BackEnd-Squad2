@@ -58,7 +58,7 @@ public abstract class GenericController<U extends GenericDto<T>, T extends IEnti
 			throws DtoToEntityException, Exception {
 		if (getService().get(id) == null)
 			return ResponseEntity.notFound().build();
-		getService().alter(model.getId(), model.makeEntity());
+		getService().alter(id, model.makeEntity());
 		return ResponseEntity.noContent().build();
 	}
 
