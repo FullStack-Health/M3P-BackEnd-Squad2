@@ -35,6 +35,13 @@ public class ExceptionAdvicer {
 		return ResponseEntity.status(406).body("Paciente sem usuário cadastrado");
 	}
 
+	@ExceptionHandler(PacienteNotFoundException.class)
+	public ResponseEntity excessao(PacienteNotFoundException ex) {
+		log.error("PacienteNotFoundException");
+		log.error(ex.getMessage());
+		return ResponseEntity.status(406).body(ex.getMessage());
+	}
+
 	@ExceptionHandler(UsuarioNotFoundException.class)
 	public ResponseEntity excessao(UsuarioNotFoundException ex) {
 		log.error("UsuarioNotFoundException");

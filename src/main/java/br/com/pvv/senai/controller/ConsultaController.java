@@ -11,6 +11,7 @@ import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.exceptions.DtoToEntityException;
 import br.com.pvv.senai.exceptions.NotRequiredByProjectException;
+import br.com.pvv.senai.exceptions.PacienteNotFoundException;
 import br.com.pvv.senai.model.dto.ConsultaDto;
 import br.com.pvv.senai.service.ConsultaService;
 import br.com.pvv.senai.service.GenericService;
@@ -41,10 +42,22 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 	public ResponseEntity post(@Valid ConsultaDto model) throws DtoToEntityException, Exception {
 		var id = model.getPatientId();
 		var patient = patientService.get(id);
+		if (patient == null)
+			throw new PacienteNotFoundException(id);
 		var entity = model.makeEntity();
+		
 		entity.setPatient(patient);
 		entity = getService().create(entity);
 		return ResponseEntity.status(201).body(entity);
+	}
+	
+	@Override
+	public ResponseEntity get(Long id) {
+		var retorno = getService().get(id);
+		if (retorno == null)
+			return ResponseEntity.notFound().build();
+		retorno.setPatient(null);
+		return ResponseEntity.ok(retorno);
 	}
 
 }
