@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,6 @@ import br.com.pvv.senai.entity.Exame;
 import br.com.pvv.senai.entity.Paciente;
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.exceptions.PacienteUserNotFoundException;
 import br.com.pvv.senai.model.Prontuario;
 import br.com.pvv.senai.model.ProntuarioDetails;
 import br.com.pvv.senai.model.dto.PacienteDto;
@@ -31,6 +31,7 @@ import br.com.pvv.senai.service.ConsultaService;
 import br.com.pvv.senai.service.ExameService;
 import br.com.pvv.senai.service.GenericService;
 import br.com.pvv.senai.service.PacienteService;
+import jakarta.validation.Valid;
 
 @Controller
 @RestController
@@ -55,7 +56,7 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 	}
 
 	@Override
-	public ResponseEntity post(PacienteDto model) throws Exception {
+	public ResponseEntity post(@RequestBody @Valid PacienteDto model) throws Exception {
 		String cpfLimpo = model.getCPF().replaceAll("[^\\d]", "");
 		if (!usuarioService.has(model.getEmail())) {
 			Usuario usuario = new Usuario();
