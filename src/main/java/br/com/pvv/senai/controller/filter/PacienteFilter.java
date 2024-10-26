@@ -11,15 +11,15 @@ import br.com.pvv.senai.entity.Paciente;
 
 public class PacienteFilter implements IFilter<Paciente> {
 
-	private String nome;
-	private String telefone;
+	private String name;
+	private String phone;
 	private String email;
 	private int pageSize;
 	private int pageNumber;
 
 	public PacienteFilter(Map<String, String> params) {
-		this.setNome(params.get("nome"));
-		this.setTelefone(params.get("telefone"));
+		this.setName(params.get("name"));
+		this.setPhone(params.get("phone"));
 		this.setEmail(params.get("email"));
 		this.setPageNumber(params.get("pageNumber") != null ? Integer.parseInt(params.get("pageNumber")) : 0);
 		this.setPageSize(params.get("pageSize") != null ? Integer.parseInt(params.get("pageSize")) : 10);
@@ -34,34 +34,36 @@ public class PacienteFilter implements IFilter<Paciente> {
 	public Example<Paciente> example() {
 
 		ExampleMatcher matcher = ExampleMatcher.matchingAny()
-				.withMatcher("nome", match -> match.ignoreCase().contains())
-				.withMatcher("telefone", match -> match.exact())
+				.withMatcher("name", match -> match.ignoreCase().contains())
+				.withMatcher("phone", match -> match.exact())
 				.withMatcher("email", match -> match.ignoreCase().contains()) //
 				.withIgnorePaths("id") //
 				.withIgnoreNullValues();
 
 		Paciente paciente = new Paciente();
-		paciente.setName(this.getNome());
-		paciente.setPhone(this.getTelefone());
-		paciente.setEmail(this.getTelefone());
+		paciente.setName(this.getName());
+		paciente.setPhone(this.getPhone());
+		paciente.setEmail(this.getEmail());
 
 		return Example.of(paciente, matcher);
 	}
+	
+	
 
-	public String getNome() {
-		return nome;
+	public String getName() {
+		return name;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getTelefone() {
-		return telefone;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
 	public String getEmail() {
