@@ -31,7 +31,7 @@ public class Consulta implements IEntity {
 	private String prescribedMedication;
 	@Column(length = 256)
 	private String observation;
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
 	@JoinColumn(name = "id_paciente")
 	private Paciente patient;
 
