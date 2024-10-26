@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -92,17 +93,17 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 
 
 	@GetMapping("prontuarios")
-	public ResponseEntity<List<ProntuarioDto>> getProntuario(
+	public ResponseEntity<Page<ProntuarioDto>>   list(
 			@RequestParam(required = false) String nome,
 			@RequestParam(required = false) Long id,
 			@RequestParam Map<String, String> params) {
 		var filter = new ProntuarioFilter(params);
 		var paged = service.paged(filter.example(), filter.getPagination());
-		var retorno = paged.map(paciente -> new ProntuarioDto(
+		Page<ProntuarioDto> retorno = paged.map(paciente -> new ProntuarioDto(
 				paciente,
 				exameService.findByPacienteId(paciente.getId()),
 				consultaService.findByPacienteId(paciente.getId())
-		)).toList();
+		));
 
 		if (retorno.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
