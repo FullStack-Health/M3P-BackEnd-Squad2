@@ -30,7 +30,9 @@ public abstract class GenericService<T extends IEntity> {
 	}
 
 	public T get(long id) {
-		return this.getRepository().findById(id).orElse(null);
+		var optional = this.getRepository().findById(id);
+		if (optional.isEmpty()) return null;
+		return optional.get();
 	}
 
 	public T alter(long id, T model) {
