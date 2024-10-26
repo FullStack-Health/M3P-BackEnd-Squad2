@@ -105,6 +105,7 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.GET, //
 								"/pacientes/{id}", //
 								"/consultas/{id}", //
+								"/consultas",
 								"/exames/{id}")
 						.hasAuthority(Perfil.PACIENTE.scope())
 						// GUEST
