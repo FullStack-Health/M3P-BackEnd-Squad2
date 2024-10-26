@@ -1,18 +1,5 @@
 package br.com.pvv.senai.security;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
-
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.repository.UserRepository;
@@ -20,6 +7,12 @@ import br.com.pvv.senai.service.GenericService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UsuarioService extends GenericService<Usuario> {
@@ -91,4 +84,5 @@ public class UsuarioService extends GenericService<Usuario> {
 		return example;
 	}
 
+	public long count() { return repository.count(); }
 }
