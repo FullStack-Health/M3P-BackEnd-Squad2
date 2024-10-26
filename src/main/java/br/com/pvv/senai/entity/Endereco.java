@@ -27,6 +27,23 @@ public class Endereco implements IEntity {
 	@Column()
 	private String pontoDeReferencia;
 
+	public Endereco() {
+		super();
+	}
+
+	public Endereco(long id, String cEP, String cidade, String logradouro, int numero, String complemento,
+			String bairro, String pontoDeReferencia) {
+		super();
+		Id = id;
+		CEP = cEP;
+		this.cidade = cidade;
+		this.logradouro = logradouro;
+		this.numero = numero;
+		this.complemento = complemento;
+		this.bairro = bairro;
+		this.pontoDeReferencia = pontoDeReferencia;
+	}
+
 	public long getId() {
 		return Id;
 	}

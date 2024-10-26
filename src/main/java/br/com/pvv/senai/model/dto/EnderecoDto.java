@@ -12,7 +12,19 @@ public class EnderecoDto extends GenericDto<Endereco> {
 	private String complemento;
 	private String bairro;
 	private String pontoDeReferencia;
-	
+
+	public EnderecoDto(long id, String cEP, String cidade, String logradouro, int numero, String complemento,
+			String bairro, String pontoDeReferencia) {
+		super();
+		Id = id;
+		CEP = cEP;
+		this.cidade = cidade;
+		this.logradouro = logradouro;
+		this.numero = numero;
+		this.complemento = complemento;
+		this.bairro = bairro;
+		this.pontoDeReferencia = pontoDeReferencia;
+	}
 
 	@Override
 	protected Class<Endereco> getType() {
@@ -82,6 +94,5 @@ public class EnderecoDto extends GenericDto<Endereco> {
 	public void setPontoDeReferencia(String pontoDeReferencia) {
 		this.pontoDeReferencia = pontoDeReferencia;
 	}
-
 
 }

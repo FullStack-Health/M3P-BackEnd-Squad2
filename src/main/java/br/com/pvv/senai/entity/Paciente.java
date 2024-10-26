@@ -68,6 +68,37 @@ public class Paciente implements IEntity {
 	@OneToMany
 	private List<Exame> exames;
 
+	public Paciente() {
+		super();
+	}
+
+	public Paciente(long id, String name, String gender, Date birthDate, String cPF, String rG, String maritalStatus,
+			String phone, String email, String birthCity, String emergencyContact, String allergies, String specialCare,
+			String insuranceCompany, String insuranceNumber, Date insuranceExpiration, Endereco address,
+			Usuario usuario, List<Consulta> consultas, List<Exame> exames) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.gender = gender;
+		this.birthDate = birthDate;
+		CPF = cPF;
+		RG = rG;
+		this.maritalStatus = maritalStatus;
+		this.phone = phone;
+		this.email = email;
+		this.birthCity = birthCity;
+		this.emergencyContact = emergencyContact;
+		this.allergies = allergies;
+		this.specialCare = specialCare;
+		this.insuranceCompany = insuranceCompany;
+		this.insuranceNumber = insuranceNumber;
+		this.insuranceExpiration = insuranceExpiration;
+		this.address = address;
+		this.usuario = usuario;
+		this.consultas = consultas;
+		this.exames = exames;
+	}
+
 	public List<Consulta> getConsultas() {
 		return consultas;
 	}

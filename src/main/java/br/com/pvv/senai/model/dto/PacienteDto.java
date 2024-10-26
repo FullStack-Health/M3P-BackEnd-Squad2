@@ -1,5 +1,6 @@
 package br.com.pvv.senai.model.dto;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -47,6 +48,45 @@ public class PacienteDto extends GenericDto<Paciente> {
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
 	private Date insuranceExpiration;
 	private EnderecoDto address;
+
+	public PacienteDto(long id, @NotNull @Size(min = 8, max = 64) String name, @NotNull String gender,
+			@NotNull Date birthDate, @NotNull @Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}") String cPF,
+			@NotNull @Size(max = 20) String rG, @NotNull String maritalStatus,
+			@NotNull @Pattern(regexp = "\\(\\d{2}\\) \\d{1} \\d{4}-\\d{4}") String phone, @Email String email,
+			@NotNull @Size(min = 8, max = 64) String birthCity,
+			@NotNull @Pattern(regexp = "\\(\\d{2}\\) \\d{1} \\d{4}-\\d{4}") String emergencyContact, String allergies,
+			String specialCare, String insuranceCompany, String insuranceNumber, Date insuranceExpiration,
+			EnderecoDto address) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.gender = gender;
+		this.birthDate = birthDate;
+		CPF = cPF;
+		RG = rG;
+		this.maritalStatus = maritalStatus;
+		this.phone = phone;
+		this.email = email;
+		this.birthCity = birthCity;
+		this.emergencyContact = emergencyContact;
+		this.allergies = allergies;
+		this.specialCare = specialCare;
+		this.insuranceCompany = insuranceCompany;
+		this.insuranceNumber = insuranceNumber;
+		this.insuranceExpiration = insuranceExpiration;
+		this.address = address;
+	}
+
+	public PacienteDto() {
+		super();
+	}
+
+	public PacienteDto(long id2, String name2, String gender2, LocalDate birthDate2, String cPF2, String rG2,
+			String maritalStatus2, String phone2, String email2, String birthCity2, String emergencyContact2,
+			String allergies2, String specialCare2, String insuranceCompany2, String insuranceNumber2,
+			LocalDate insuranceExpiration2, EnderecoDto address2) {
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	protected Class<Paciente> getType() {

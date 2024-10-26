@@ -31,6 +31,7 @@ import br.com.pvv.senai.service.ConsultaService;
 import br.com.pvv.senai.service.ExameService;
 import br.com.pvv.senai.service.GenericService;
 import br.com.pvv.senai.service.PacienteService;
+import br.com.pvv.senai.utils.SenhaUtils;
 
 @Controller
 @RestController
@@ -62,6 +63,7 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 			usuario.setPerfil(Perfil.PACIENTE);
 			usuario.setEmail(model.getEmail());
 			usuario.setPassword( new BCryptPasswordEncoder().encode(cpfLimpo));
+			usuario.setSenhaMascarada(SenhaUtils.gerarSenhaMascarada(cpfLimpo));
 			usuario.setNome(model.getName());
 			usuario.setTelefone(model.getPhone());
 			usuario.setDataNascimento(model.getBirthDate());

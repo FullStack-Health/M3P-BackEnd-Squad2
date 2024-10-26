@@ -36,6 +36,24 @@ public class Usuario implements UserDetails, IEntity {
 	@Column()
 	private Perfil perfil;
 
+	public Usuario() {
+		super();
+	}
+
+	public Usuario(long id, String nome, String telefone, String email, Date dataNascimento, String cpf,
+			String password, String senhaMascarada, Perfil perfil) {
+		super();
+		Id = id;
+		this.nome = nome;
+		this.telefone = telefone;
+		this.email = email;
+		this.dataNascimento = dataNascimento;
+		this.cpf = cpf;
+		this.password = password;
+		this.senhaMascarada = senhaMascarada;
+		this.perfil = perfil;
+	}
+
 	public String getTelefone() {
 		return telefone;
 	}
