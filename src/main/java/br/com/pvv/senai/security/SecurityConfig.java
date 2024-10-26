@@ -99,13 +99,14 @@ public class SecurityConfig {
 								"/pacientes" , //
 //								"/pacientes/{id}", //
 								"/usuarios",
+								"/consultas",
+								"/exames",
 								"/usuarios/me"
 						).hasAuthority(Perfil.MEDICO.scope())
 						// pacientes
 						.requestMatchers(HttpMethod.GET, //
 								"/pacientes/{id}", //
 								"/consultas/{id}", //
-								"/consultas",
 								"/exames/{id}")
 						.hasAuthority(Perfil.PACIENTE.scope())
 						// GUEST

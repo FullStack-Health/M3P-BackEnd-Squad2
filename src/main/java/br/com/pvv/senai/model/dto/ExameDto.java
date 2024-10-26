@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import br.com.pvv.senai.entity.Exame;
+import br.com.pvv.senai.model.dto.annotations.SkipMakeEntity;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -30,8 +31,20 @@ public class ExameDto extends GenericDto<Exame> {
 	private String URL;
 	@Size(min = 16, max = 1024)
 	private String resultados;
-	@NotNull
+	
 	private PacienteDto paciente;
+
+	@NotNull
+	@SkipMakeEntity
+	private int patientId;
+
+	public final int getPatientId() {
+		return patientId;
+	}
+
+	public final void setPatientId(int patientId) {
+		this.patientId = patientId;
+	}
 
 	@Override
 	protected Class<Exame> getType() {
