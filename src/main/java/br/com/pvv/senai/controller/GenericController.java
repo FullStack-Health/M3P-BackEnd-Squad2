@@ -49,7 +49,7 @@ public abstract class GenericController<U extends GenericDto<T>, T extends IEnti
 	public ResponseEntity put(@PathVariable Long id, @Valid @RequestBody U model) throws DtoToEntityException {
 		if (getService().get(id) == null)
 			ResponseEntity.notFound().build();
-		getService().alter(model.getId(), model.makeEntity());
+		getService().alter(id, model.makeEntity());
 		return ResponseEntity.noContent().build();
 	}
 
