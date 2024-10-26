@@ -83,10 +83,6 @@ public class UsuarioService extends GenericService<Usuario> {
 		return this.repository.findOne(example);
 	}
 
-	public List<Usuario> findBySpec(Specification<Usuario> spec) {
-		return repository.findAll(spec);
-	}
-
 	private Example<Usuario> makeExample(String email) {
 		ExampleMatcher matcher = ExampleMatcher.matchingAny().withIgnoreNullValues();
 		Usuario u = new Usuario();
