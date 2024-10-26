@@ -66,9 +66,7 @@ class UserRepositoryTest {
         userRepository.saveAndFlush(usuario);
         assertEquals(userRepository.findById(1L), usuario);
     }
-
-
-
+    
     //TODO existsById
 
     //TODO delete
