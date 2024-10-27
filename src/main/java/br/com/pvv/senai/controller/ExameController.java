@@ -7,10 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.pvv.senai.controller.filter.ExameFilter;
 import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.entity.Exame;
 import br.com.pvv.senai.exceptions.DtoToEntityException;
-import br.com.pvv.senai.exceptions.NotRequiredByProjectException;
 import br.com.pvv.senai.exceptions.PacienteNotFoundException;
 import br.com.pvv.senai.model.dto.ExameDto;
 import br.com.pvv.senai.service.ExameService;
@@ -35,7 +35,7 @@ public class ExameController extends GenericController<ExameDto, Exame> {
 
 	@Override
 	public IFilter<Exame> filterBuilder(Map<String, String> params) throws Exception {
-		throw new NotRequiredByProjectException();
+		return new ExameFilter(params);
 	}
 
 	@Override
