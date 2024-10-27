@@ -1,5 +1,18 @@
 package br.com.pvv.senai.security;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Service;
+
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.repository.UserRepository;
@@ -7,12 +20,6 @@ import br.com.pvv.senai.service.GenericService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class UsuarioService extends GenericService<Usuario> {
@@ -25,7 +32,6 @@ public class UsuarioService extends GenericService<Usuario> {
 
 	@Override
 	public Page<Usuario> paged(Example<Usuario> example, Pageable pageable) {
-//		return super.paged(example, pageable);
 		var cb = em.getCriteriaBuilder();
 		var q = cb.createQuery(Usuario.class);
 		var p = q.from(Usuario.class);
@@ -33,22 +39,20 @@ public class UsuarioService extends GenericService<Usuario> {
 		var userExample = example.getProbe();
 
 		cb.notEqual(p.get("perfil"), Perfil.PACIENTE);
-		Predicate withEmail = null;
-		Predicate withNome = null;
+		List<Predicate> predicates = new ArrayList<>();
 
+		if (userExample.getId() != 0)
+			predicates.add(cb.equal(p.get("id"), userExample.getId()));
 		if (userExample.getEmail() != null)
-			withEmail = cb.like(p.get("email"), "%" + userExample.getEmail() + "%");
+			predicates.add(cb.like(p.get("email"), "%" + userExample.getEmail() + "%"));
 		if (userExample.getNome() != null)
-			withNome = cb.like(p.get("nome"), "%" + userExample.getNome() + "%");
+			predicates.add(cb.like(p.get("nome"), "%" + userExample.getNome() + "%"));
 
 		Predicate withWhere = null;
-		if (withEmail != null && withNome != null)
-			withWhere = cb.or(withEmail, withNome);
-		else if (withEmail != null || withNome != null)
-			if (withEmail != null)
-				withWhere = withEmail;
-			else
-				withWhere = withNome;
+		if (predicates.size() == 1)
+			withWhere = predicates.get(0);
+		else
+			withWhere = cb.or(predicates.toArray(new Predicate[predicates.size()]));
 
 		CriteriaQuery<Usuario> select = null;
 		if (withWhere != null)
@@ -84,5 +88,7 @@ public class UsuarioService extends GenericService<Usuario> {
 		return example;
 	}
 
-	public long count() { return repository.count(); }
+	public long count() {
+		return repository.count();
+	}
 }
