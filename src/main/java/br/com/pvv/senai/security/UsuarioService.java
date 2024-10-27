@@ -37,9 +37,9 @@ public class UsuarioService extends GenericService<Usuario> {
 		Predicate withNome = null;
 
 		if (userExample.getEmail() != null)
-			withEmail = cb.like(p.get("email"), userExample.getEmail());
+			withEmail = cb.like(p.get("email"), "%" + userExample.getEmail() + "%");
 		if (userExample.getNome() != null)
-			withNome = cb.like(p.get("nome"), userExample.getNome());
+			withNome = cb.like(p.get("nome"), "%" + userExample.getNome() + "%");
 
 		Predicate withWhere = null;
 		if (withEmail != null && withNome != null)
