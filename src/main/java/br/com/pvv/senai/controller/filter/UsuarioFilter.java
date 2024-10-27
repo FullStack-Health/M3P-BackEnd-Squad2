@@ -31,21 +31,21 @@ public class UsuarioFilter implements IFilter<Usuario> {
 	@Override
 	public Example<Usuario> example() {
 
-		ExampleMatcher example;
+		ExampleMatcher example = ExampleMatcher.matching();
 
-		if (getId() == 0)
-			example = ExampleMatcher.matchingAny()
-//					.withMatcher("id", match -> match.exact())
-					.withMatcher("telefone", match -> match.ignoreCase().contains())
-					.withMatcher("email", match -> match.ignoreCase().contains()) //
-					.withIgnorePaths("id") //
-					.withIgnoreNullValues();
-		else
-			example = ExampleMatcher.matchingAny().withMatcher("id", match -> match.exact())
-					.withMatcher("telefone", match -> match.ignoreCase().contains())
-					.withMatcher("email", match -> match.ignoreCase().contains()) //
+//		if (getId() == 0)
+//			example = ExampleMatcher.matchingAny()
+////					.withMatcher("id", match -> match.exact())
+//					.withMatcher("telefone", match -> match.ignoreCase().contains())
+//					.withMatcher("email", match -> match.ignoreCase().contains()) //
 //					.withIgnorePaths("id") //
-					.withIgnoreNullValues();
+//					.withIgnoreNullValues();
+//		else
+//			example = ExampleMatcher.matchingAny().withMatcher("id", match -> match.exact())
+//					.withMatcher("telefone", match -> match.ignoreCase().contains())
+//					.withMatcher("email", match -> match.ignoreCase().contains()) //
+////					.withIgnorePaths("id") //
+//					.withIgnoreNullValues();
 
 		Usuario usuario = new Usuario();
 		if (getId() != 0)
