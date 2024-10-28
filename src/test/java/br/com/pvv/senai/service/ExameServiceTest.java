@@ -1,8 +1,8 @@
 package br.com.pvv.senai.service;
 
-import br.com.pvv.senai.entity.Consulta;
+import br.com.pvv.senai.entity.Exame;
 import br.com.pvv.senai.entity.Paciente;
-import br.com.pvv.senai.repository.ConsultaRepository;
+import br.com.pvv.senai.repository.ExameRepository;
 import br.com.pvv.senai.repository.PacienteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,24 +22,24 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class ConsultaServiceTest {
+class ExameServiceTest {
 
     @Mock
-    ConsultaRepository repository;
+    ExameRepository repository;
 
     @Mock
     PacienteRepository pacienteRepository;
 
     @InjectMocks
-    ConsultaService service;
+    ExameService service;
 
     @Mock
     PacienteService pacienteService;
 
-    Consulta consulta;
+    Exame exame;
     Paciente paciente;
-    List<Consulta> consultas;
-
+    List<Exame> exames;
+    
     @BeforeEach
     void setup(){
         MockitoAnnotations.openMocks(this);
@@ -60,16 +60,17 @@ class ConsultaServiceTest {
         paciente.setInsuranceCompany("Saúde Qcode");
         paciente.setInsuranceNumber("1234567890");
 
-        consulta = new Consulta();
-        consulta.setId(1L);
-        consulta.setReason("Razão da consulta");
-        consulta.setObservation("Observações");
-        consulta.setPatient(paciente);
-        consulta.setDate(LocalDate.parse("2021-12-31"));
-        consulta.setTime(LocalTime.parse("10:00:00"));
+        exame = new Exame();
+        exame.setId(1L);
+        exame.setNome("Nome do exame");
+        exame.setTipo("Tipo do exame");
+        exame.setLaboratorio("Laboratório do exame");
+        exame.setResultados("Resultados do exame");
+        exame.setPaciente(paciente);
+        exame.setDataExame(LocalDate.parse("2021-12-31"));
+        exame.setHoraExame(LocalTime.parse("10:00:00"));
     }
-
-
+    
     @Test
     @DisplayName("Deve injetar o repositório")
     void getRepository() {
@@ -77,100 +78,45 @@ class ConsultaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve criar uma consulta")
+    @DisplayName("Deve criar um exame")
     void create() {
         // Given
-        when(repository.save(any(Consulta.class))).thenReturn(consulta);
+        when(repository.save(any(Exame.class))).thenReturn(exame);
         // When
-        Consulta consultaSalva = service.create(consulta);
+        Exame exameSalvo = service.create(exame);
         // Then
-        assertNotNull(consultaSalva);
-        assertEquals(consulta.getId(), consulta.getId());
-        verify(repository).save(any(Consulta.class));
+        assertNotNull(exameSalvo);
+        assertEquals(exame.getId(), exame.getId());
+        verify(repository).save(any(Exame.class));
     }
 
     @Test
-    @DisplayName("Deve alterar uma consulta")
+    @DisplayName("Deve alterar um exame")
     void alter() {
         // Given
-        when(repository.save(any(Consulta.class))).thenReturn(consulta);
+        when(repository.save(any(Exame.class))).thenReturn(exame);
         // When
-        Consulta consultaSalva = service.alter(1L, consulta);
+        Exame exameSalvo = service.alter(1L, exame);
         // Then
-        assertNotNull(consultaSalva);
-        assertEquals(consulta.getId(), consulta.getId());
-        verify(repository).save(any(Consulta.class));
+        assertNotNull(exameSalvo);
+        assertEquals(exame.getId(), exame.getId());
+        verify(repository).save(any(Exame.class));
     }
 
     @Test
-    @DisplayName("Deve buscar consultas por id do paciente")
+    @DisplayName("Deve buscar exames por id do paciente")
     void findByPacienteId() {
         // Given
-        when(repository.findByPatientId(1L)).thenReturn(List.of(consulta));
+        when(repository.findByPacienteId(1L)).thenReturn(List.of(exame));
         // When
-        consultas = service.findByPacienteId(1L);
+        exames = service.findByPacienteId(1L);
         // Then
-        assertEquals(consultas.get(0).getId(), consulta.getId());
-        verify(repository).findByPatientId(1L);
+        assertEquals(exames.get(0).getId(), exame.getId());
+        verify(repository).findByPacienteId(1L);
     }
 
     @Test
-    @DisplayName("Deve retornar consulta pelo id")
-    void get(){
-        // Given
-        when(repository.findById(1L)).thenReturn(Optional.of(consulta));
-        // When
-        Consulta consultaEncontrada = service.get(1L);
-        // Then
-        assertNotNull(consultaEncontrada);
-        assertEquals(consulta.getId(), consultaEncontrada.getId());
-        verify(repository).findById(1L);
-    }
-
-    @Test
-    @DisplayName("Deve deletar consulta pelo id")
-    void delete(){
-        // Given
-        when(repository.findById(1L)).thenReturn(Optional.of(consulta));
-        // When
-        boolean deletado = service.delete(1L);
-        // Then
-        assertTrue(deletado);
-        verify(repository).delete(consulta);
-    }
-
-    @Test
-    @DisplayName("Deve retornar página de consultas")
-    void paged(){
-        // Given
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Consulta> page = new PageImpl<>(List.of(consulta), pageable, 1);
-        when(repository.findAll(any(Example.class), any(Pageable.class))).thenReturn(page);
-        // When
-        Page<Consulta> resultado = service.paged(Example.of(consulta), pageable);
-        // Then
-        assertNotNull(resultado);
-        assertEquals(1, resultado.getTotalElements());
-        assertEquals(consulta.getId(), resultado.getContent().get(0).getId());
-        verify(repository).findAll(any(Example.class), any(Pageable.class));
-    }
-
-    @Test
-    @DisplayName("Deve retornar lista com todas as consultas")
-    void all(){
-        // Given
-        when(repository.findAll()).thenReturn(List.of(consulta));
-        // When
-        var resultado = service.all();
-        // Then
-        assertNotNull(resultado);
-        assertEquals(paciente.getId(), resultado.get(0).getId());
-        verify(repository).findAll();
-    }
-
-
-    @Test
-    @DisplayName("Deve retornar quantidade de consultas no repositório")
+    @DisplayName("Deve retornar quantidade de exames no repositório")
     void count() {
         // Given
         when(repository.count()).thenReturn(1L);
@@ -181,5 +127,58 @@ class ConsultaServiceTest {
         verify(repository).count();
     }
 
+    @Test
+    @DisplayName("Deve retornar exame pelo id")
+    void get(){
+        // Given
+        when(repository.findById(1L)).thenReturn(Optional.of(exame));
+        // When
+        Exame exameEncontrado = service.get(1L);
+        // Then
+        assertNotNull(exameEncontrado);
+        assertEquals(exame.getId(), exameEncontrado.getId());
+        verify(repository).findById(1L);
+    }
 
+    @Test
+    @DisplayName("Deve deletar exame pelo id")
+    void delete(){
+        // Given
+        when(repository.findById(1L)).thenReturn(Optional.of(exame));
+        // When
+        boolean deletado = service.delete(1L);
+        // Then
+        assertTrue(deletado);
+        verify(repository).delete(exame);
+    }
+
+    @Test
+    @DisplayName("Deve retornar página de exames")
+    void paged(){
+        // Given
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Exame> page = new PageImpl<>(List.of(exame), pageable, 1);
+        when(repository.findAll(any(Example.class), any(Pageable.class))).thenReturn(page);
+        // When
+        Page<Exame> resultado = service.paged(Example.of(exame), pageable);
+        // Then
+        assertNotNull(resultado);
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals(exame.getId(), resultado.getContent().get(0).getId());
+        verify(repository).findAll(any(Example.class), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista com todos os exames")
+    void all(){
+        // Given
+        when(repository.findAll()).thenReturn(List.of(exame));
+        // When
+        var resultado = service.all();
+        // Then
+        assertNotNull(resultado);
+        assertEquals(paciente.getId(), resultado.get(0).getId());
+        verify(repository).findAll();
+    }
+    
 }
