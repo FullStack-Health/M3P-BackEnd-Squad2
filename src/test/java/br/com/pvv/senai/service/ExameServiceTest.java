@@ -93,7 +93,7 @@ class ExameServiceTest {
     }
 
     @Test
-    @DisplayName("Deve alterar uma exame")
+    @DisplayName("Deve alterar um exame")
     void alter() {
         // Given
         when(repository.save(any(Exame.class))).thenReturn(exame);
@@ -171,7 +171,7 @@ class ExameServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar lista com todas as exames")
+    @DisplayName("Deve retornar lista com todos os exames")
     void all(){
         // Given
         when(repository.findAll()).thenReturn(List.of(exame));
