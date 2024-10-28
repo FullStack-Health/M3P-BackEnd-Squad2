@@ -2,12 +2,11 @@ package br.com.pvv.senai.controller;
 
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.security.TokenService;
+import br.com.pvv.senai.security.SecurityFilter;
 import br.com.pvv.senai.security.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,7 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@SpringBootTest
+
 @WebMvcTest(UsuarioController.class)
 class UsuarioControllerTest {
 
@@ -32,8 +31,8 @@ class UsuarioControllerTest {
     @MockBean
     UsuarioService usuarioService;
 
-    @InjectMocks
-    TokenService tokenService;
+    @MockBean
+    private SecurityFilter securityFilter;
 
     Usuario usuario;
 
