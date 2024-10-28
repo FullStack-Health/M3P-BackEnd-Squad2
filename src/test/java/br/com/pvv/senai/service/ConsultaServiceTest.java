@@ -2,7 +2,6 @@ package br.com.pvv.senai.service;
 
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.entity.Paciente;
-import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.repository.ConsultaRepository;
 import br.com.pvv.senai.repository.PacienteRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +38,6 @@ class ConsultaServiceTest {
 
     Consulta consulta;
     Paciente paciente;
-    Usuario usuario;
     List<Consulta> consultas;
 
     @BeforeEach
