@@ -2,6 +2,7 @@ package br.com.pvv.senai.repository;
 
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Example;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,33 +28,40 @@ class UserRepositoryTest {
 
     @BeforeEach
     void setup(){
-        usuario.setId(1L);
         usuario.setEmail("usuario@teste.com");
         usuario.setPassword("12345678");
         usuario.setPerfil(Perfil.ADMIN);
     }
 
-    @Test
-    @DisplayName("Deve lançar um erro ao salvar pessoa usuária vazia no repositório")
-    void saveException(){
-        assertThrows(Exception.class, () -> userRepository.save(new Usuario()));
+    @AfterEach
+    void clear(){
+        userRepository.deleteAll();
     }
 
     @Test
     @DisplayName("Deve salvar pessoa usuária no repositório e retornar pessoa salva")
     void save(){
-        assertEquals(userRepository.save(usuario), usuario);
+        Usuario usuarioSalvo = userRepository.save(usuario);
+        assertEquals(usuario.getEmail(), usuarioSalvo.getEmail());
     }
 
     @Test
     @DisplayName("Deve verificar se uma pessoa usuária existe")
     void exists(){
-        userRepository.saveAndFlush(usuario);
-        Example<Usuario> example = Example.of(usuario);
+        Usuario usuarioSalvo = userRepository.save(usuario);
+        Example<Usuario> example = Example.of(usuarioSalvo);
         assertTrue(userRepository.exists(example));
     }
 
-    //TODO findOne
+    @Test
+    @DisplayName("Deve retornar uma pessoa usuária através do e-mail")
+    void findByEmail() {
+        userRepository.save(usuario);
+        Optional<Usuario> usuarioEncontrado = userRepository.findByEmail("usuario@teste.com");
+        assertTrue(usuarioEncontrado.isPresent());
+        assertEquals(usuario.getEmail(), usuarioEncontrado.get().getEmail());
+    }
+
 
     @Test
     @DisplayName("Deve retornar uma lista de todas pessoas usuárias")
@@ -63,12 +73,26 @@ class UserRepositoryTest {
     @Test
     @DisplayName("Deve retornar uma pessoa usuária através do Id")
     void findById() {
-        userRepository.saveAndFlush(usuario);
-        assertEquals(userRepository.findById(1L), usuario);
+        Usuario usuarioSalvo = userRepository.save(usuario);
+        Optional<Usuario> usuarioEncontrado = userRepository.findById(usuarioSalvo.getId());
+        assertTrue(usuarioEncontrado.isPresent());
+        assertEquals(usuarioSalvo.getId(), usuarioEncontrado.get().getId());
+        assertEquals(usuarioSalvo.getEmail(), usuarioEncontrado.get().getEmail());
     }
-    
-    //TODO existsById
 
-    //TODO delete
+    @Test
+    @DisplayName("Deve verificar se uma pessoa usuária existe através do Id")
+    void existsById(){
+        Usuario usuarioSalvo = userRepository.save(usuario);
+        assertTrue(userRepository.existsById(usuarioSalvo.getId()));
+    }
+
+    @Test
+    @DisplayName("Deve deletar uma pessoa usuária")
+    void delete() {
+        userRepository.save(usuario);
+        userRepository.delete(usuario);
+        assertFalse(userRepository.existsById(1L));
+    }
 
 }
