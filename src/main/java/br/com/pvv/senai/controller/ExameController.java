@@ -2,6 +2,7 @@ package br.com.pvv.senai.controller;
 
 import java.util.Map;
 
+import br.com.pvv.senai.exceptions.ExameNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,4 +52,30 @@ public class ExameController extends GenericController<ExameDto, Exame> {
 		return ResponseEntity.status(201).body(entity);
 	}
 
+@Override
+	public ResponseEntity put(Long id, @Valid ExameDto model)
+		throws DtoToEntityException, ExameNotFoundException,  PacienteNotFoundException{
+
+	System.out.println("ID do exame a ser atualizado: " + id);
+	System.out.println("ID do paciente recebido: " + model.getPatientId());
+
+	Exame existingExame = getService().get(id);
+	if (existingExame == null) {
+		throw new ExameNotFoundException();
+	}
+
+	var patient = patientService.get(model.getPatientId());
+		if (patient == null)
+			throw new PacienteNotFoundException(model.getPatientId());
+
+		var entity = model.makeEntity();
+		entity.setPaciente(patient);
+
+		entity = getService().alter(id, entity);
+		entity.setPaciente(null);
+		return ResponseEntity.ok(entity);
+	}
+
+
 }
+
