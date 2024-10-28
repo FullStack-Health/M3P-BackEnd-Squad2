@@ -99,6 +99,8 @@ public class SecurityConfig {
 								"/pacientes" , //
 //								"/pacientes/{id}", //
 								"/usuarios",
+								"/consultas",
+								"/exames",
 								"/usuarios/me"
 						).hasAuthority(Perfil.MEDICO.scope())
 						// pacientes

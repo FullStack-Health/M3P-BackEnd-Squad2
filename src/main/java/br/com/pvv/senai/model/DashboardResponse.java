@@ -2,32 +2,36 @@ package br.com.pvv.senai.model;
 
 public class DashboardResponse {
 
-	private long qtdPacientes;
-	private long qtdConsultas;
-	private long qtdExames;
+	private Long qtdPacientes;
+	private Long qtdConsultas;
+	private Long qtdExames;
+	public Long qtdUsuarios;
 
-	public long getQtdPacientes() {
+	public Long getQtdPacientes() {
 		return qtdPacientes;
 	}
 
-	public void setQtdPacientes(long qtdPacientes) {
+	public void setQtdPacientes(Long qtdPacientes) {
 		this.qtdPacientes = qtdPacientes;
 	}
 
-	public long getQtdConsultas() {
+	public Long getQtdConsultas() {
 		return qtdConsultas;
 	}
 
-	public void setQtdConsultas(long qtdConsultas) {
+	public void setQtdConsultas(Long qtdConsultas) {
 		this.qtdConsultas = qtdConsultas;
 	}
 
-	public long getQtdExames() {
+	public Long getQtdExames() {
 		return qtdExames;
 	}
 
-	public void setQtdExames(long qtdExames) {
+	public void setQtdExames(Long qtdExames) {
 		this.qtdExames = qtdExames;
 	}
 
+	public Long getQtdUsuarios() { return qtdUsuarios; }
+
+	public void setQtdUsuarios(Long qtdUsuarios) { this.qtdUsuarios = qtdUsuarios; }
 }
