@@ -86,7 +86,7 @@ class ExameServiceTest {
         Exame exameSalvo = service.create(exame);
         // Then
         assertNotNull(exameSalvo);
-        assertEquals(exame.getId(), exame.getId());
+        assertEquals(exameSalvo.getId(), exame.getId());
         verify(repository).save(any(Exame.class));
     }
 
@@ -99,7 +99,7 @@ class ExameServiceTest {
         Exame exameSalvo = service.alter(1L, exame);
         // Then
         assertNotNull(exameSalvo);
-        assertEquals(exame.getId(), exame.getId());
+        assertEquals(exameSalvo.getId(), exame.getId());
         verify(repository).save(any(Exame.class));
     }
 
