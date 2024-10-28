@@ -2,6 +2,7 @@ package br.com.pvv.senai.controller;
 
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
+import br.com.pvv.senai.security.SecurityConfig;
 import br.com.pvv.senai.security.SecurityFilter;
 import br.com.pvv.senai.security.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,10 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -34,6 +37,9 @@ class UsuarioControllerTest {
     @MockBean
     private SecurityFilter securityFilter;
 
+    @MockBean
+    private SecurityConfig securityConfig;
+
     Usuario usuario;
 
     @BeforeEach
@@ -48,6 +54,7 @@ class UsuarioControllerTest {
 
     @Test
     void getService() {
+
     }
 
     @Test
@@ -68,6 +75,7 @@ class UsuarioControllerTest {
 
     @Test
     @DisplayName("Deve cadastrar uma pessoa usuária")
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     void post() throws Exception {
         when(usuarioService.create(any(Usuario.class))).thenReturn(usuario);
 
@@ -89,7 +97,15 @@ class UsuarioControllerTest {
     }
 
     @Test
-    void changePassword() {
+    @DisplayName("Deve modificar a senha de uma pessoa usuária")
+    void changePassword() throws Exception {
+        when(usuarioService.findByEmail("usuario@mail.com")).thenReturn(Optional.ofNullable(usuario));
+        mvc.perform(MockMvcRequestBuilders.put("/usuarios/email/usuario@mail.com/redefinir-senha")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        12341234
+                        """))
+                .andExpect(status().isNoContent());
     }
 
     @Test
