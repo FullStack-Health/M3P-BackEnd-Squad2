@@ -95,4 +95,12 @@ class UserRepositoryTest {
         assertFalse(userRepository.existsById(1L));
     }
 
+    @Test
+    @DisplayName("Deve contar quantidade de pessoa usuárias")
+    void count() {
+        userRepository.save(usuario);
+        long quantidade = userRepository.count();
+        assertTrue(quantidade > 0);
+    }
+
 }

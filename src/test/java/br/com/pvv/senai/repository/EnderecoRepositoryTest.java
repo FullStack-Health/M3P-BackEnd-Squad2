@@ -42,6 +42,7 @@ class EnderecoRepositoryTest {
     void findAll() {
         repository.save(endereco);
         assertTrue(repository.findAll().size() > 0);
+        assertEquals(endereco.getCidade(), repository.findAll().get(0).getCidade());
     }
 
     @Test
