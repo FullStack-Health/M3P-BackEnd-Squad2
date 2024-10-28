@@ -45,11 +45,11 @@ public class SecurityConfig {
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
 						// ADMIN
-						.requestMatchers(HttpMethod.POST, //
-//								"/exames", //
-//								"/consultas", //
-//								"/pacientes" // , //
-								"/usuarios" //
+						.requestMatchers(HttpMethod.POST,
+								"/exames",
+								"/consultas",
+								"/pacientes",
+								"/usuarios"
 						).hasAuthority(Perfil.ADMIN.scope())//
 						.requestMatchers(HttpMethod.PUT, //
 								"/exames/{id}",
