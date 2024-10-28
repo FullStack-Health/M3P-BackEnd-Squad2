@@ -2,6 +2,11 @@ package br.com.pvv.senai.security;
 
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,13 +20,15 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class UsuarioServiceTest {
 
     @Mock
     UserRepository userRepository;
+
+    @Mock
+    EntityManager em;
 
     @InjectMocks
     UsuarioService usuarioService;
@@ -74,15 +81,26 @@ class UsuarioServiceTest {
     void paged() {
         // Given
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Usuario> page = new PageImpl<>(List.of(usuario), pageable, 1);
-        when(userRepository.findAll(any(Example.class), any(Pageable.class))).thenReturn(page);
+
+        CriteriaBuilder cb = mock(CriteriaBuilder.class);
+        CriteriaQuery<Usuario> criteriaQuery = mock(CriteriaQuery.class);
+        Root<Usuario> root = mock(Root.class);
+        TypedQuery<Usuario> query = mock(TypedQuery.class);
+
+        when(em.getCriteriaBuilder()).thenReturn(cb);
+        when(cb.createQuery(Usuario.class)).thenReturn(criteriaQuery);
+        when(criteriaQuery.from(Usuario.class)).thenReturn(root);
+        when(em.createQuery(criteriaQuery)).thenReturn(query);
+        when(query.getResultList()).thenReturn(List.of(usuario));
+
         // When
         Page<Usuario> resultado = usuarioService.paged(Example.of(usuario), pageable);
+
         // Then
         assertNotNull(resultado);
         assertEquals(1, resultado.getTotalElements());
         assertEquals(usuario.getId(), resultado.getContent().get(0).getId());
-        verify(userRepository).findAll(any(Example.class), any(Pageable.class));
+        verify(em).createQuery(any(CriteriaQuery.class));
     }
 
     @Test
