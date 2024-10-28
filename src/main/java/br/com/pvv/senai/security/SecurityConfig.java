@@ -44,35 +44,18 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
-						// ADMIN
-						.requestMatchers(HttpMethod.POST,
-								"/exames",
-								"/consultas",
-								"/pacientes",
-								"/usuarios"
-						).hasAuthority(Perfil.ADMIN.scope())//
-						.requestMatchers(HttpMethod.PUT, //
-								"/exames/{id}",
-								"/consultas/{id}",
-								"/pacientes/{id}",
-								"/usuarios/{id}")
-						.hasAuthority(Perfil.ADMIN.scope())//
-						.requestMatchers(HttpMethod.DELETE,
-								"/exames/{id}",
-								"/consultas/{id}",
-								"/pacientes/{id}",
-								"/usuarios/{id}")
-						.hasAuthority(Perfil.ADMIN.scope())
+						// GUEST
+						.requestMatchers("/login", //
+								"/usuarios/pre-registro", //
+								"/usuarios/email/{email}/redefinir-senha"//
+						).permitAll()
+						// pacientes
 						.requestMatchers(HttpMethod.GET, //
-								"/usuarios/{id}"
-//								"/dashboard**", //
-//								"/pacientes/{id}/prontuarios", //
-//								"/pacientes/prontuarios", //
-////								"/exames/{id}", //
-////								"/consultas/{id}", //
-//								"/pacientes"// , //
-////								"/pacientes/{id}" //
-						).hasAuthority(Perfil.ADMIN.scope())
+								"/pacientes/{id}", //
+								"/consultas/{id}", //
+								"/exames/{id}", //
+								"/usuarios/me" //
+						).hasAuthority(Perfil.PACIENTE.scope())
 						// MEDICO
 						.requestMatchers(HttpMethod.POST, //
 								"/exames", //
@@ -82,8 +65,7 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.PUT, //
 								"/exames/{id}", //
 								"/consultas/{id}", //
-								"/pacientes/{id}"
-								)
+								"/pacientes/{id}")
 						.hasAuthority(Perfil.MEDICO.scope())//
 						.requestMatchers(HttpMethod.DELETE, //
 								"/exames/{id}", //
@@ -96,25 +78,41 @@ public class SecurityConfig {
 								"/pacientes/prontuarios", //
 //								"/exames/{id}", //
 //								"/consultas/{id}", //
-								"/pacientes" , //
+								"/pacientes", //
 //								"/pacientes/{id}", //
-								"/usuarios",
-								"/consultas",
-								"/exames",
-								"/usuarios/me"
+								"/usuarios", "/consultas", //
+								"/exames" //
 						).hasAuthority(Perfil.MEDICO.scope())
-						// pacientes
-						.requestMatchers(HttpMethod.GET, //
-								"/pacientes/{id}", //
+
+						// ADMIN
+						.requestMatchers(HttpMethod.POST, "/exames", //
+								"/consultas", //
+								"/pacientes", //
+								"/usuarios")
+						.hasAuthority(Perfil.ADMIN.scope())//
+						.requestMatchers(HttpMethod.PUT, //
+								"/exames/{id}", //
 								"/consultas/{id}", //
-								"/exames/{id}")
-						.hasAuthority(Perfil.PACIENTE.scope())
-						// GUEST
-						.requestMatchers(
-								"/login",
-								"/usuarios/pre-registro",
-								"/usuarios/email/{email}/redefinir-senha"
-								).permitAll()
+								"/pacientes/{id}", //
+								"/usuarios/{id}")
+						.hasAuthority(Perfil.ADMIN.scope())//
+						.requestMatchers(HttpMethod.DELETE, //
+								"/exames/{id}", //
+								"/consultas/{id}", //
+								"/pacientes/{id}", //
+								"/usuarios/{id}")
+						.hasAuthority(Perfil.ADMIN.scope()).requestMatchers(HttpMethod.GET, //
+								"/usuarios/{id}"
+//								"/dashboard**", //
+//								"/pacientes/{id}/prontuarios", //
+//								"/pacientes/prontuarios", //
+////								"/exames/{id}", //
+////								"/consultas/{id}", //
+//								"/pacientes"// , //
+////								"/pacientes/{id}" //
+						).hasAuthority(Perfil.ADMIN.scope()) //
+						.requestMatchers(HttpMethod.GET, "/**") //
+						.permitAll()
 				// OUTRAS ROTAS
 //						.anyRequest().denyAll()//
 				).oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
