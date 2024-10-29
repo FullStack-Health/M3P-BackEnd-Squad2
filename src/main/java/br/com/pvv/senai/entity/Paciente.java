@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,6 +61,7 @@ public class Paciente implements IEntity {
 	@OneToOne()
 	private Endereco address;
 
+	@JsonIgnore
 	@OneToOne(cascade = CascadeType.DETACH, orphanRemoval = true)
 	@JoinColumn(name = "id_usuario", nullable = false)
 	private Usuario usuario;
