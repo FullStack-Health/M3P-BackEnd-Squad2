@@ -123,7 +123,7 @@ public class ExceptionAdvicer {
 	public ResponseEntity excessao(NotAuthorizedException ex) {
 		log.error("NotAuthorizedException");
 		log.error(ex.getMessage());
-		return ResponseEntity.status(400).body("Não autorizado por designação do projeto.");
+		return ResponseEntity.status(401).body("Não autorizado por designação do projeto.");
 	}
 
 }

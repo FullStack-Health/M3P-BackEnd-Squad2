@@ -96,7 +96,6 @@ class UsuarioServiceTest {
 		when(fTypedQuery.getResultList()).thenReturn(List.of(usuario));
 		when(fakeCriteriaQuery.where(any(Expression.class))).thenReturn(fakeCriteriaQuery);
 		when(fakeCriteriaQuery.select(any(Expression.class))).thenReturn(fakeCriteriaQuery);
-		when(userRepository.findAll(any(Example.class), any(Pageable.class))).thenReturn(page);
 
 		// when
 		Page<Usuario> resultado = usuarioService.paged(Example.of(usuario), pageable);

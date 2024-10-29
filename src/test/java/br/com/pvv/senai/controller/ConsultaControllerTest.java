@@ -1,4 +1,4 @@
-package br.com.pvv.senai;
+package br.com.pvv.senai.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
