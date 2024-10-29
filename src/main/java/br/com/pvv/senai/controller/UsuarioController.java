@@ -38,6 +38,7 @@ import br.com.pvv.senai.model.dto.UsuarioDtoMinimal;
 import br.com.pvv.senai.model.dto.UsuarioUpdateDto;
 import br.com.pvv.senai.security.UsuarioService;
 import br.com.pvv.senai.service.GenericService;
+import br.com.pvv.senai.service.PacienteService;
 import br.com.pvv.senai.utils.SenhaUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -51,6 +52,9 @@ public class UsuarioController {
 
 	@Autowired
 	private UsuarioService service;
+	
+	@Autowired
+	private PacienteService pacienteService;
 
 	public GenericService<Usuario> getService() {
 		return service;
@@ -84,6 +88,10 @@ public class UsuarioController {
 	@GetMapping("/me")
 	public ResponseEntity me(Principal principal) {
 		var usuario = service.findByEmail(principal.getName());
+		if (usuario.isEmpty()) throw new UsuarioNotFoundException();
+		var entity = usuario.get();
+		var patient = pacienteService.findByEmail(entity.getEmail());
+		if (patient!= null) entity.setPaciente(patient);
 		return ResponseEntity.ok(usuario);
 	}
 

@@ -1,16 +1,26 @@
 package br.com.pvv.senai.entity;
 
-import br.com.pvv.senai.enums.Perfil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.com.pvv.senai.enums.Perfil;
+import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Usuario implements UserDetails, IEntity {
@@ -35,6 +45,17 @@ public class Usuario implements UserDetails, IEntity {
 	private String senhaMascarada;
 	@Column()
 	private Perfil perfil;
+
+	@OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+	private Paciente paciente;
+
+	public Paciente getPaciente() {
+		return paciente;
+	}
+
+	public void setPaciente(Paciente paciente) {
+		this.paciente = paciente;
+	}
 
 	public String getTelefone() {
 		return telefone;
