@@ -16,8 +16,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,12 +50,10 @@ class TokenServiceTest {
     @DisplayName("Deve gerar um token para Usuario do tipo Admin")
     void generateTokenUsuario() {
         // Given
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        List<GrantedAuthority> authorities = List.of(() -> "ROLE_ADMIN");
         Usuario usuario = mock(Usuario.class);
         when(usuario.getEmail()).thenReturn("usuario@teste.com");
-        when(usuario.getAuthorities()).thenReturn(authorities);
-
+        when(usuario.getAuthorities()).thenReturn((Collection) authorities);
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("senai-labmedical")
@@ -64,8 +63,13 @@ class TokenServiceTest {
                 .claim("scope", "ROLE_ADMIN")
                 .build();
 
-        JwtEncoderParameters encoderParameters = JwtEncoderParameters.from(claims);
-        when(encoder.encode(encoderParameters)).thenReturn(new Jwt("mocked-token", Instant.now(), Instant.now().plusSeconds(3600L), null, claims.getClaims()));
+        Map<String, Object> headers = Map.of("alg", "HS256");
+
+        Jwt jwt = new Jwt("mocked-token", Instant.now(), Instant.now().plusSeconds(3600L), headers, claims.getClaims());
+
+        System.out.println(jwt.getTokenValue());
+
+        when(encoder.encode(any(JwtEncoderParameters.class))).thenReturn(jwt);
 
         // When
         String token = service.generateToken(usuario);
@@ -82,7 +86,7 @@ class TokenServiceTest {
         // Given
         Authentication authentication = mock(Authentication.class);
         when(authentication.getName()).thenReturn("authUser");
-        when(authentication.getAuthorities()).thenReturn(List.of((GrantedAuthority) () -> "ROLE_ADMIN"));
+        when(authentication.getAuthorities()).thenReturn((Collection) List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("senai-labmedical")
@@ -108,7 +112,9 @@ class TokenServiceTest {
     void validateToken() {
         // Given
         String token = "token-válido";
-        when(decoder.decode(token)).thenReturn(mock(Jwt.class));
+        Jwt jwt = mock(Jwt.class);
+        when(jwt.getSubject()).thenReturn("subject");
+        when(decoder.decode(token)).thenReturn(jwt);
 
         // When
         String subject = service.validateToken(token);
