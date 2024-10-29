@@ -100,7 +100,7 @@ public class ExameDto extends GenericDto<Exame> {
 	}
 
 	public String getURL() {
-		return URL;
+		return URL != null ? URL : "";
 	}
 
 	public void setURL(String uRL) {

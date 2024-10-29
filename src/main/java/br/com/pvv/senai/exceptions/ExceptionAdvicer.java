@@ -49,6 +49,13 @@ public class ExceptionAdvicer {
 		return ResponseEntity.status(404).body("Usuário não localizado.");
 	}
 
+	@ExceptionHandler(ExameNotFoundException.class)
+	public ResponseEntity excessao(ExameNotFoundException ex) {
+		log.error("ExameNotFoundException");
+		log.error(ex.getMessage());
+		return ResponseEntity.status(404).body(ex.getMessage());
+	}
+
 	@ExceptionHandler(DtoToEntityException.class)
 	public ResponseEntity excessao(DtoToEntityException ex) {
 		log.error("DtoToEntityException");
