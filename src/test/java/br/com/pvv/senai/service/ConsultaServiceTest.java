@@ -85,7 +85,7 @@ class ConsultaServiceTest {
         Consulta consultaSalva = service.create(consulta);
         // Then
         assertNotNull(consultaSalva);
-        assertEquals(consulta.getId(), consulta.getId());
+        assertEquals(consultaSalva.getId(), consulta.getId());
         verify(repository).save(any(Consulta.class));
     }
 
@@ -98,7 +98,7 @@ class ConsultaServiceTest {
         Consulta consultaSalva = service.alter(1L, consulta);
         // Then
         assertNotNull(consultaSalva);
-        assertEquals(consulta.getId(), consulta.getId());
+        assertEquals(consultaSalva.getId(), consulta.getId());
         verify(repository).save(any(Consulta.class));
     }
 
