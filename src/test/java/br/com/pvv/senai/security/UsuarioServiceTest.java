@@ -1,47 +1,5 @@
 package br.com.pvv.senai.security;
 
-<<<<<<< Updated upstream
-import br.com.pvv.senai.entity.Usuario;
-import br.com.pvv.senai.repository.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
-=======
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Optional;
-
->>>>>>> Stashed changes
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-
-<<<<<<< Updated upstream
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-=======
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.repository.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -50,26 +8,32 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
->>>>>>> Stashed changes
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.*;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 class UsuarioServiceTest {
 
 	@Mock
 	UserRepository userRepository;
 
-<<<<<<< Updated upstream
     @Mock
     EntityManager em;
 
     @InjectMocks
     UsuarioService usuarioService;
-=======
-	@Mock
-	EntityManager em;
->>>>>>> Stashed changes
-
-	@InjectMocks
-	UsuarioService usuarioService;
 
 	Usuario usuario;
 
@@ -101,34 +65,6 @@ class UsuarioServiceTest {
 		verify(userRepository).exists(any());
 	}
 
-<<<<<<< Updated upstream
-    @Test
-    @DisplayName("Deve retornar página de pessoas usuárias")
-    void paged() {
-        // Given
-        Pageable pageable = PageRequest.of(0, 10);
-
-        CriteriaBuilder cb = mock(CriteriaBuilder.class);
-        CriteriaQuery<Usuario> criteriaQuery = mock(CriteriaQuery.class);
-        Root<Usuario> root = mock(Root.class);
-        TypedQuery<Usuario> query = mock(TypedQuery.class);
-
-        when(em.getCriteriaBuilder()).thenReturn(cb);
-        when(cb.createQuery(Usuario.class)).thenReturn(criteriaQuery);
-        when(criteriaQuery.from(Usuario.class)).thenReturn(root);
-        when(em.createQuery(criteriaQuery)).thenReturn(query);
-        when(query.getResultList()).thenReturn(List.of(usuario));
-
-        // When
-        Page<Usuario> resultado = usuarioService.paged(Example.of(usuario), pageable);
-
-        // Then
-        assertNotNull(resultado);
-        assertEquals(1, resultado.getTotalElements());
-        assertEquals(usuario.getId(), resultado.getContent().get(0).getId());
-        verify(em).createQuery(any(CriteriaQuery.class));
-    }
-=======
 	@Test
 	@DisplayName("Deve retornar lista de pessoas usuárias")
 	void list() {
@@ -141,12 +77,10 @@ class UsuarioServiceTest {
 		assertEquals(usuario.getId(), resultado.get(0).getId());
 		verify(userRepository).findAll();
 	}
->>>>>>> Stashed changes
 
 	@Test
 	@DisplayName("Deve retornar página de pessoas usuárias")
 	void paged() {
-		// Given
 		// Given
 		CriteriaBuilder cb = mock(CriteriaBuilder.class);
 		CriteriaQuery<Usuario> fakeCriteriaQuery = mock(CriteriaQuery.class);
@@ -157,7 +91,6 @@ class UsuarioServiceTest {
 
 		when(em.getCriteriaBuilder()).thenReturn(cb);
 		when(em.createQuery(fakeCriteriaQuery)).thenReturn(fTypedQuery);
-//		when(userRepository.findById(anyLong())).thenReturn(Optional.of(usuario));
 		when(cb.createQuery(Usuario.class)).thenReturn(fakeCriteriaQuery);
 		when(fakeCriteriaQuery.from(Usuario.class)).thenReturn(fakeRoot);
 		when(fTypedQuery.getResultList()).thenReturn(List.of(usuario));
@@ -172,7 +105,6 @@ class UsuarioServiceTest {
 		assertNotNull(resultado);
 		assertEquals(1, resultado.getTotalElements());
 		assertEquals(usuario.getId(), resultado.getContent().get(0).getId());
-//		verify(userRepository).findAll(any(Example.class), any(Pageable.class));
 		verify(em).getCriteriaBuilder();
 		verify(em).createQuery(fakeCriteriaQuery);
 		verify(cb).createQuery(Usuario.class);
@@ -198,21 +130,12 @@ class UsuarioServiceTest {
 	@DisplayName("Deve retornar pessoa usuária por id")
 	void get() {
 		// Given
-		CriteriaBuilder mockCriteriaBuilder = mock(CriteriaBuilder.class);
-//		when(em.getCriteriaBuilder()).thenReturn(mockCriteriaBuilder);
 		when(userRepository.findById(anyLong())).thenReturn(Optional.of(usuario));
-
-		// Mock do CriteriaQuery
-		CriteriaQuery<Usuario> fakeCriteriaQuery = mock(CriteriaQuery.class);
-		when(mockCriteriaBuilder.createQuery(Usuario.class)).thenReturn(fakeCriteriaQuery);
-
 		// When
 		Usuario usuarioEncontrado = usuarioService.get(1L);
 		// Then
 		assertNotNull(usuarioEncontrado);
 		assertEquals(usuario.getId(), usuarioEncontrado.getId());
-//		verify(em).getCriteriaBuilder();
-//		verify(mockCriteriaBuilder).createQuery(Usuario.class);
 	}
 
 	@Test
