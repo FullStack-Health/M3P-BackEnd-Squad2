@@ -1,38 +1,10 @@
 package br.com.pvv.senai.controller;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.controller.filter.UsuarioFilter;
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.exceptions.DtoToEntityException;
-import br.com.pvv.senai.exceptions.EmailViolationExistentException;
-import br.com.pvv.senai.exceptions.NotAuthorizedException;
-import br.com.pvv.senai.exceptions.UnauthorizationException;
-import br.com.pvv.senai.exceptions.UsuarioNotFoundException;
+import br.com.pvv.senai.exceptions.*;
 import br.com.pvv.senai.model.dto.UsuarioDto;
 import br.com.pvv.senai.model.dto.UsuarioDtoMinimal;
 import br.com.pvv.senai.model.dto.UsuarioUpdateDto;
@@ -45,6 +17,21 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.apache.coyote.BadRequestException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -76,7 +63,8 @@ public class UsuarioController {
 			List<Usuario> list = new ArrayList<>();
 			if (full_list.size() > 0) {
 				for (var user : full_list)
-					if (user.getPerfil() != Perfil.PACIENTE)
+					// Houve mudança no documento do projeto, e agora o endpoint GET /usuarios também retorna pacientes.
+//					if (user.getPerfil() != Perfil.PACIENTE)
 						list.add(user);
 				PageImpl<Usuario> p = new PageImpl<Usuario>(list);
 				return ResponseEntity.ok(p);
@@ -157,9 +145,10 @@ public class UsuarioController {
 		if (usuario == null) {
 			throw new UsuarioNotFoundException();
 		}
-		if (usuario.getPerfil() == Perfil.PACIENTE) {
-			throw new NotAuthorizedException();
-		}
+		// Houve mudança no documento do projeto, e agora os endpoints GET /usuarios também retornam pacientes.
+//		if (usuario.getPerfil() == Perfil.PACIENTE) {
+//			throw new NotAuthorizedException();
+//		}
 		return ResponseEntity.ok(usuario);
 	}
 
