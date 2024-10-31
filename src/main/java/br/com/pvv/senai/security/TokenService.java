@@ -3,6 +3,7 @@ package br.com.pvv.senai.security;
 import java.time.Instant;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -16,8 +17,8 @@ import br.com.pvv.senai.entity.Usuario;
 @Service
 public class TokenService {
 
-	private final JwtEncoder encoder;
-	private final JwtDecoder decoder;
+	private JwtEncoder encoder;
+	private JwtDecoder decoder;
 
 	public TokenService(JwtEncoder encoder, JwtDecoder decoder) {
 		super();
