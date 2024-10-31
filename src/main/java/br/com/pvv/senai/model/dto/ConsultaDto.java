@@ -7,33 +7,43 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.model.dto.annotations.SkipMakeEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class ConsultaDto extends GenericDto<Consulta> {
 
+	@Schema(description = "Identificador único", example = "12345")
 	private long Id;
+
 	@NotNull
 	@Size(min = 8, max = 64)
+	@Schema(description = "Motivo da consulta", example = "Consulta de rotina")
 	private String reason;
 	@NotNull
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@Schema(description = "Data da consulta", example = "2024-10-31")
 	private LocalDate date;
 	@NotNull
 	@DateTimeFormat(pattern = "hh:mm:ss")
+	@Schema(description = "Hora da consulta", example = "14:30:00")
 	private LocalTime time;
 	@NotNull
 	@Size(min = 16, max = 1024)
+	@Schema(description = "Descrição do problema", example = "Paciente relata dores intensas na região lombar.")
 	private String issueDescription;
+	@Schema(description = "Medicação prescrita", example = "Ibuprofeno 400mg")
 	private String prescribedMedication;
 	@Size(min = 16, max = 256)
+	@Schema(description = "Observações adicionais", example = "Paciente deve retornar em 2 semanas para acompanhamento.")
 	private String observation;
-
 	@SkipMakeEntity
+	@Schema(description = "Dados do paciente")
 	private PacienteDto patient;
 
 	@NotNull
 	@SkipMakeEntity
+	@Schema(description = "Identificador do paciente", example = "67890")
 	private int patientId;
 
 	@Override

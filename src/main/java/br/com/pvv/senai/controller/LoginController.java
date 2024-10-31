@@ -15,6 +15,12 @@ import br.com.pvv.senai.exceptions.UnauthorizationException;
 import br.com.pvv.senai.model.dto.LoginRequestDTO;
 import br.com.pvv.senai.repository.UserRepository;
 import br.com.pvv.senai.security.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
 @RestController
@@ -31,7 +37,10 @@ public class LoginController {
 	private TokenService jwtService;
 
 	@PostMapping
-	public ResponseEntity login(@RequestBody @Valid LoginRequestDTO login) throws MethodArgumentNotValidException, UnauthorizationException {
+	@Operation(summary = "Login de usuário", description = "Autentica um usuário com base nas credenciais fornecidas.")
+	public ResponseEntity login(
+			@Parameter(description = "Credenciais de login do usuário", required = true)
+			@RequestBody @Valid LoginRequestDTO login) throws MethodArgumentNotValidException, UnauthorizationException {
 		var usernamePassword = new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword());
 		try {
 			var auth = this.manager.authenticate(usernamePassword);

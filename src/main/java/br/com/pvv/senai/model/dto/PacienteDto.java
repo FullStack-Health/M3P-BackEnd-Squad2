@@ -5,6 +5,7 @@ import java.util.Date;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import br.com.pvv.senai.entity.Paciente;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -12,41 +13,59 @@ import jakarta.validation.constraints.Size;
 
 public class PacienteDto extends GenericDto<Paciente> {
 
-	private long id;
-	@NotNull
-	@Size(min = 8, max = 64)
-	private String name;
-	@NotNull
-	private String gender;
-	@NotNull
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
-	private Date birthDate;
-	@NotNull
-	@Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}")
-	private String CPF;
-	@NotNull
-	@Size(max = 20)
-	private String RG;
-	@NotNull
-	private String maritalStatus;
-	@NotNull
-	@Pattern(regexp = "\\(\\d{2}\\) \\d{1} \\d{4}-\\d{4}")
-	private String phone;
-	@Email
-	private String email;
-	@NotNull
-	@Size(min = 8, max = 64)
-	private String birthCity;
-	@NotNull
-	@Pattern(regexp = "\\(\\d{2}\\) \\d{1} \\d{4}-\\d{4}")
-	private String emergencyContact;
-	private String allergies;
-	private String specialCare;
-	private String insuranceCompany;
-	private String insuranceNumber;
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
-	private Date insuranceExpiration;
-	private EnderecoDto address;
+	@Schema(description = "Identificador único da pessoa", example = "12345")
+    private long id;
+    @NotNull
+    @Size(min = 8, max = 64)
+    @Schema(description = "Nome completo da pessoa", example = "João da Silva")
+    private String name;
+    @NotNull
+    @Schema(description = "Gênero da pessoa", example = "Masculino")
+    private String gender;
+    @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
+    @Schema(description = "Data de nascimento da pessoa", example = "1990-01-01")
+    private Date birthDate;
+    @NotNull
+    @Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}")
+    @Schema(description = "CPF da pessoa", example = "123.456.789-00")
+    private String CPF;
+    @NotNull
+    @Size(max = 20)
+    @Schema(description = "RG da pessoa", example = "MG-12.345.678")
+    private String RG;
+    @NotNull
+    @Schema(description = "Estado civil da pessoa", example = "Solteiro")
+    private String maritalStatus;
+    @NotNull
+    @Pattern(regexp = "\\(\\d{2}\\) \\d{1} \\d{4}-\\d{4}")
+    @Schema(description = "Telefone da pessoa", example = "(31) 9 1234-5678")
+    private String phone;
+    @Email
+    @Schema(description = "Email da pessoa", example = "joao.silva@example.com")
+    private String email;
+    @NotNull
+    @Size(min = 8, max = 64)
+    @Schema(description = "Cidade de nascimento da pessoa", example = "Belo Horizonte")
+    private String birthCity;
+    @NotNull
+    @Pattern(regexp = "\\(\\d{2}\\) \\d{1} \\d{4}-\\d{4}")
+    @Schema(description = "Contato de emergência da pessoa", example = "(31) 9 8765-4321")
+    private String emergencyContact;
+    @Schema(description = "Alergias da pessoa", example = "Nenhuma")
+    private String allergies;
+    @Schema(description = "Cuidados especiais da pessoa", example = "Nenhum")
+    private String specialCare;
+    @Schema(description = "Companhia de seguro da pessoa", example = "Seguro Saúde XYZ")
+    private String insuranceCompany;
+    @Schema(description = "Número do seguro da pessoa", example = "1234567890")
+    private String insuranceNumber;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, pattern = "yyyy-MM-dd")
+    @Schema(description = "Data de expiração do seguro da pessoa", example = "2025-12-31")
+    private Date insuranceExpiration;
+
+    @Schema(description = "Endereço da pessoa")
+    private EnderecoDto address;
 
 	@Override
 	protected Class<Paciente> getType() {
