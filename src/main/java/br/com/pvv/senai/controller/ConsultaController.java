@@ -3,6 +3,7 @@ package br.com.pvv.senai.controller;
 import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.entity.Paciente;
+import br.com.pvv.senai.exceptions.ConsultaNotFoundException;
 import br.com.pvv.senai.exceptions.DtoToEntityException;
 import br.com.pvv.senai.exceptions.NotRequiredByProjectException;
 import br.com.pvv.senai.exceptions.PacienteNotFoundException;
@@ -66,6 +67,11 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 			throws DtoToEntityException, PacienteNotFoundException {
 		if (getService().get(id) == null)
 			return ResponseEntity.notFound().build();
+
+		Consulta existingConsulta = getService().get(id);
+		if (existingConsulta == null) {
+			throw new ConsultaNotFoundException();
+		}
 
 		Paciente patient = patientService.get(model.getPatientId());
 		if (patient == null)
