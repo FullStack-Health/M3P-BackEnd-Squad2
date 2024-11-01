@@ -1,13 +1,5 @@
 package br.com.pvv.senai.controller;
 
-import java.util.Map;
-
-import org.hibernate.proxy.HibernateProxy;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.entity.Paciente;
@@ -19,6 +11,13 @@ import br.com.pvv.senai.service.ConsultaService;
 import br.com.pvv.senai.service.GenericService;
 import br.com.pvv.senai.service.PacienteService;
 import jakarta.validation.Valid;
+import org.hibernate.proxy.HibernateProxy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/consultas")
@@ -72,7 +71,9 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 		if (patient == null)
 			throw new PacienteNotFoundException(model.getPatientId());
 
-		patient = (Paciente) ((HibernateProxy) patient).getHibernateLazyInitializer().getImplementation();
+		if (patient instanceof HibernateProxy) {
+			patient = (Paciente) ((HibernateProxy) patient).getHibernateLazyInitializer().getImplementation();
+		}
 
 		var entity = model.makeEntity();
 		entity.setPatient(patient);
