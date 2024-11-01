@@ -24,6 +24,9 @@ public class Endereco implements IEntity {
 	private String complemento;
 	@Column()
 	private String bairro;
+
+	@Column()
+	private String estado;
 	@Column()
 	private String pontoDeReferencia;
 
@@ -81,6 +84,14 @@ public class Endereco implements IEntity {
 
 	public void setBairro(String bairro) {
 		this.bairro = bairro;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
 	}
 
 	public String getPontoDeReferencia() {
