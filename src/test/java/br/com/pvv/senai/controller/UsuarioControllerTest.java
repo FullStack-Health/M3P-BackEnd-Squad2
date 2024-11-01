@@ -35,6 +35,7 @@ import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.repository.UserRepository;
 import br.com.pvv.senai.security.TokenService;
 import br.com.pvv.senai.security.UsuarioService;
+import br.com.pvv.senai.service.PacienteService;
 
 @AutoConfigureMockMvc
 @WebMvcTest(UsuarioController.class)
@@ -45,6 +46,9 @@ class UsuarioControllerTest {
 
 	@MockBean
 	UsuarioService usuarioService;
+	
+	@MockBean
+	PacienteService pacienteService;
 
 	@MockBean
 	TokenService tokenService;
