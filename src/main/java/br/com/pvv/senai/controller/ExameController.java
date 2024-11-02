@@ -65,9 +65,6 @@ public class ExameController extends GenericController<ExameDto, Exame> {
 			@Parameter(description = "Novo conteúdo da entidade a ser atualizado.", required = true) @Valid ExameDto model)
 			throws DtoToEntityException, ExameNotFoundException, PacienteNotFoundException {
 
-		System.out.println("ID do exame a ser atualizado: " + id);
-		System.out.println("ID do paciente recebido: " + model.getPatientId());
-
 		Exame existingExame = getService().get(id);
 		if (existingExame == null) {
 			throw new ExameNotFoundException();
