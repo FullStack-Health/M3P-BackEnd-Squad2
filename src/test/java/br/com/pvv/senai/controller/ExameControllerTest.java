@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,44 +22,82 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.web.client.RestTemplate;
 
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.entity.Endereco;
+import br.com.pvv.senai.entity.Exame;
 import br.com.pvv.senai.entity.Paciente;
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.model.dto.ConsultaDto;
+import br.com.pvv.senai.model.dto.ExameDto;
 import br.com.pvv.senai.model.dto.PacienteDto;
+import br.com.pvv.senai.security.SecurityFilter;
+import br.com.pvv.senai.security.UsuarioService;
 import br.com.pvv.senai.service.ConsultaService;
+import br.com.pvv.senai.service.ExameService;
 import br.com.pvv.senai.service.PacienteService;
 
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
-public class ConsultaControllerTest {
+public class ExameControllerTest {
 
 	@InjectMocks
-	ConsultaController controller;
+	ExameController controller;
 
 	@Mock
-	ConsultaService service;
-	
+	ExameService service;
+
 	@Mock
 	PacienteService patientService;
 
+	@MockBean
+	UsuarioService userService;
+
+	@MockBean
+	ExameService exameService;
+
+	@MockBean
+	ConsultaService consultaService;
+
+	@MockBean
+	SecurityFilter securityFilter;
+
+	Usuario usuarioCorrect;
+	Usuario usuarioWrongMail;
 	Usuario usuarioPaciente;
+	PacienteDto putPaciente;
 	Paciente paciente;
 
 	ConsultaDto consultaDto;
 	ConsultaDto putConsulta;
 	Consulta consulta;
+	ExameDto putExame;
+	Exame exame;
 
 	String token;
 
 	void clearEntitys() {
+		usuarioCorrect = new Usuario();
+		usuarioCorrect.setNome("Nome de usuário");
+		usuarioCorrect.setEmail("usuario@teste.com");
+		usuarioCorrect.setDataNascimento(java.sql.Date.valueOf(LocalDate.of(1980, 10, 10)));
+		usuarioCorrect.setTelefone("(48) 9 9999-9999");
+		usuarioCorrect.setCpf("000.000.000-00");
+		usuarioCorrect.setPassword("12341234");
+		usuarioCorrect.setPerfil(Perfil.MEDICO);
+
+		usuarioWrongMail = new Usuario();
+		usuarioWrongMail.setNome("Nome de usuário");
+		usuarioWrongMail.setEmail("usuarioteste.com");
+		usuarioWrongMail.setDataNascimento(java.sql.Date.valueOf(LocalDate.of(1980, 10, 10)));
+		usuarioWrongMail.setTelefone("(48) 9 9999-9999");
+		usuarioWrongMail.setCpf("000.000.000-00");
+		usuarioWrongMail.setPassword("12341234");
+		usuarioWrongMail.setPerfil(Perfil.MEDICO);
+
 		usuarioPaciente = new Usuario();
 		usuarioPaciente.setNome("Nome de usuário");
 		usuarioPaciente.setEmail("carlos.souza@example.com");
@@ -78,7 +115,7 @@ public class ConsultaControllerTest {
 		consulta.setIssueDescription("Paciente relatou dores de cabeça frequentes e cansaço.");
 		consulta.setPrescribedMedication("Paracetamol 500mg");
 		consulta.setObservation("Recomendada hidratação e repouso.");
-		
+
 		putConsulta = new ConsultaDto();
 
 		putConsulta.setReason("Check-up anual");
@@ -122,6 +159,24 @@ public class ConsultaControllerTest {
 		paciente.setInsuranceNumber("9876543210");
 		paciente.setInsuranceExpiration(new Date(126, 5, 30));
 
+		putPaciente = new PacienteDto();
+
+		putPaciente.setName("Carlos Souza");
+		putPaciente.setGender("Masculino");
+		putPaciente.setBirthDate(new Date(85, 3, 25));
+		putPaciente.setCPF("987.654.321-00");
+		putPaciente.setRG("SP-43.210.987");
+		putPaciente.setMaritalStatus("Casado");
+		putPaciente.setPhone("(11) 9 8765-4321");
+		putPaciente.setEmail("carlos.souza@example.com");
+		putPaciente.setBirthCity("São Paulo");
+		putPaciente.setEmergencyContact("(11) 9 8765-4321");
+		putPaciente.setAllergies("Nenhuma");
+		putPaciente.setSpecialCare("Nenhum");
+		putPaciente.setInsuranceCompany("Bradesco Saúde");
+		putPaciente.setInsuranceNumber("9876543210");
+		putPaciente.setInsuranceExpiration(new Date(126, 5, 30));
+
 		Endereco endereco = new Endereco();
 
 		endereco.setCEP("38400-000");
@@ -131,6 +186,30 @@ public class ConsultaControllerTest {
 		endereco.setComplemento("Apto 101");
 		endereco.setBairro("Centro");
 		endereco.setPontoDeReferencia("Próximo ao supermercado");
+
+		exame = new Exame();
+
+		exame.setNome("Hemograma Completo");
+		exame.setDataExame(LocalDate.of(2024, 11, 2));
+		exame.setHoraExame(LocalTime.of(10, 30, 0));
+		exame.setTipo("Sangue");
+		exame.setLaboratorio("Laboratório XYZ");
+		exame.setURL("http://example.com/resultados/12345");
+		exame.setResultados("Resultados normais, sem alterações significativas.");
+		
+		exame.setPaciente(paciente);
+		
+		putExame = new ExameDto();
+
+		putExame.setNome("Hemograma Completo");
+		putExame.setDataExame(LocalDate.of(2024, 11, 2));
+		putExame.setHoraExame(LocalTime.of(10, 30, 0));
+		putExame.setTipo("Sangue");
+		putExame.setLaboratorio("Laboratório XYZ");
+		putExame.setURL("http://example.com/resultados/12345");
+		putExame.setResultados("Resultados normais, sem alterações significativas.");
+		
+		putExame.setPaciente(putPaciente);
 
 		paciente.setUsuario(usuarioPaciente);
 		paciente.setAddress(endereco);
@@ -144,99 +223,73 @@ public class ConsultaControllerTest {
 	};
 
 	@Test
-	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA DE USUÁRIOS")
-	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO", "PACIENTE" })
+	@DisplayName("LISTAR EXAME - 200 - OBTÉM LISTA DOS EXAMES")
 	void list_200() throws Exception {
-		when(service.all()).thenReturn(List.of(consulta));
+		when(service.all()).thenReturn(List.of(exame));
 
 		var resp = controller.list(Map.of());
-
-		var consultaResp = resp.getBody().getContent().get(0);
+		var body = resp.getBody().getContent().get(0);
 
 		verify(service).all();
 
 		assertNotNull(resp);
-		assertEquals("200 OK", resp.getStatusCode().toString());
-		assertEquals(consultaResp.getReason(), consulta.getReason());
+		assertEquals(exame.getNome(), body.getNome());
 	}
 
 	@Test
-	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA DE USUÁRIOS COM FILTRO REASON")
-	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO", "PACIENTE" })
+	@DisplayName("LISTAR EXAMES - 200 - OBTÉM LISTA DOS EXAMES COM FILTRO")
 	void list_200_withFilter() throws Exception {
-		when(service.paged(any(), any())).thenReturn(new PageImpl(List.of(consulta)));
+		when(service.paged(any(), any())).thenReturn(new PageImpl(List.of(exame)));
 
-		var resp = controller.list(Map.of("reason", consulta.getReason()));
-		var consultaResp = resp.getBody().getContent().get(0);
-
-		verify(service).paged(any(), any());
-
-		assertNotNull(resp);
-		assertEquals("200 OK", resp.getStatusCode().toString());
-		assertEquals(consultaResp.getReason(), consulta.getReason());
-	}
-
-	@Test
-	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA DE USUÁRIOS COM FILTRO REASON")
-	void list_404_withFilter() throws Exception {
-		when(service.paged(any(), any())).thenReturn(new PageImpl(List.of()));
-
-		var resp = controller.list(Map.of("reason", consulta.getReason() + "xx"));
+		var resp = controller.list(Map.of("name", exame.getNome()));
+		var body = resp.getBody().getContent().get(0);
 
 		verify(service).paged(any(), any());
 
 		assertNotNull(resp);
-		assertNull(resp.getBody());
-		assertEquals("404 NOT_FOUND", resp.getStatusCode().toString());
+		assertEquals(exame.getNome(), body.getNome());
 	}
 
 	@Test
-	@DisplayName("CRIA CONSULTA - 201 - CADASTRAR CONSULTA")
-	void post_201() throws Exception {
-		when(patientService.get(anyLong())).thenReturn(paciente);
-		when(service.create(any(Consulta.class))).thenReturn(consulta);
-		
-		var resp = controller.post(consultaDto);
-		var body = (Consulta) resp.getBody();
-		
-		verify(patientService).get(anyLong());
-		
+	@DisplayName("CONSULTA EXAME - 200 - OBTÉM EXAMES DETERMINADO")
+	void get_200() throws Exception {
+		when(service.get(anyLong())).thenReturn(exame);
+
+		var resp = controller.get(1L);
+		var body = (Exame) resp.getBody();
+
+		verify(service).get(anyLong());
+
 		assertNotNull(resp);
-		assertEquals(consulta.getReason(), body.getReason());
-		assertEquals(HttpStatus.CREATED.value(), resp.getStatusCode().value());
+		assertEquals(exame.getNome(), body.getNome());
 	}
-	
+
 	@Test
-	@DisplayName("ATUALIZA CONSULTA - 200 - ATUALIZA CONSULTA ESPECÍFICA")
+	@DisplayName("ATUALIZA EXAME - 200 - ATUALIZA EXAME DETERMINADO")
 	void put_200() throws Exception {
 		when(patientService.get(anyLong())).thenReturn(paciente);
-		when(service.get(anyLong())).thenReturn(consulta);
-		when(service.alter(anyLong(), any())).thenReturn(consulta);
-		
-		var resp = controller.put(1L, putConsulta);
-		var body = (Consulta) resp.getBody();
+		when(service.get(anyLong())).thenReturn(exame);
+		when(service.alter(anyLong(), any())).thenReturn(exame);
+
+		var resp = controller.put(1L, putExame);
+		var body = (Exame) resp.getBody();
 
 		verify(patientService).get(anyLong());
 		verify(service).get(anyLong());
 		verify(service).alter(anyLong(), any());
-		
+
 		assertNotNull(resp);
-		assertEquals(consulta.getReason(), body.getReason());
-		assertEquals(HttpStatus.OK.value(), resp.getStatusCode().value());
+		assertEquals(exame.getNome(), body.getNome());
 	}
 
-
 	@Test
-	@DisplayName("DELETA CONSULTA - 204 - APAGA CONSULTA ESPECÍFICA")
-	void delete_204() throws Exception {
+	@DisplayName("EXCLUI EXAME - 200 - REMOVE EXAME DETERMINADO")
+	void delete_200() throws Exception {
 		when(service.delete(anyLong())).thenReturn(true);
-		
-		var resp = controller.delete(1L);
+
+		controller.delete(1L);
 
 		verify(service).delete(anyLong());
-		
-		assertNotNull(resp);
-		assertEquals(HttpStatus.NO_CONTENT.value(), resp.getStatusCode().value());
 	}
 
 }

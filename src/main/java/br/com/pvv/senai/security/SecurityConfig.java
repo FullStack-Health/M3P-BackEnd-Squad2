@@ -67,7 +67,8 @@ public class SecurityConfig {
 						.requestMatchers( //
 								"/login", //
 								"/usuarios/pre-registro", //
-								"/usuarios/email/{email}/redefinir-senha"//
+								"/usuarios/email/{email}/redefinir-senha", //
+								"/swagger-ui" // 
 						).permitAll()
 						// pacientes
 						.requestMatchers(HttpMethod.GET, //

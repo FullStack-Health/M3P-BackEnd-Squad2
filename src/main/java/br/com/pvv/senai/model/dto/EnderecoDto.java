@@ -1,17 +1,26 @@
 package br.com.pvv.senai.model.dto;
 
 import br.com.pvv.senai.entity.Endereco;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class EnderecoDto extends GenericDto<Endereco> {
 
-	private long Id;
-	private String CEP;
-	private String cidade;
-	private String logradouro;
-	private int numero;
-	private String complemento;
-	private String bairro;
-	private String pontoDeReferencia;
+	@Schema(description = "Identificador único do endereço", example = "12345")
+    private long Id;
+    @Schema(description = "Código de Endereçamento Postal", example = "12345-678")
+    private String CEP;
+    @Schema(description = "Nome da cidade", example = "São Paulo")
+    private String cidade;
+    @Schema(description = "Nome da rua ou avenida", example = "Avenida Paulista")
+    private String logradouro;
+    @Schema(description = "Número do imóvel", example = "1000")
+    private int numero;
+    @Schema(description = "Complemento do endereço", example = "Apto 101")
+    private String complemento;
+    @Schema(description = "Nome do bairro", example = "Bela Vista")
+    private String bairro;
+    @Schema(description = "Ponto de referência próximo ao endereço", example = "Próximo ao MASP")
+    private String pontoDeReferencia;
 	
 
 	@Override
