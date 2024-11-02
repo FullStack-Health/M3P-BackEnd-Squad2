@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -20,13 +19,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.test.web.servlet.MockMvc;
 
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.entity.Endereco;
@@ -35,23 +34,42 @@ import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.model.dto.ConsultaDto;
 import br.com.pvv.senai.model.dto.PacienteDto;
+import br.com.pvv.senai.security.SecurityFilter;
+import br.com.pvv.senai.security.UsuarioService;
 import br.com.pvv.senai.service.ConsultaService;
+import br.com.pvv.senai.service.ExameService;
 import br.com.pvv.senai.service.PacienteService;
 
 @AutoConfigureMockMvc
+@WebMvcTest(PacienteController.class)
 @ExtendWith(MockitoExtension.class)
-public class ConsultaControllerTest {
+public class PacienteControllerTest {
 
 	@InjectMocks
-	ConsultaController controller;
+	PacienteController controller;
 
-	@Mock
-	ConsultaService service;
-	
-	@Mock
-	PacienteService patientService;
+	@MockBean
+	PacienteService service;
 
+	@MockBean
+	UsuarioService userService;
+
+	@MockBean
+	ExameService exameService;
+
+	@MockBean
+	ConsultaService consultaService;
+
+	@MockBean
+	SecurityFilter securityFilter;
+
+	@Autowired
+	MockMvc mvc;
+
+	Usuario usuarioCorrect;
+	Usuario usuarioWrongMail;
 	Usuario usuarioPaciente;
+	PacienteDto putPaciente;
 	Paciente paciente;
 
 	ConsultaDto consultaDto;
@@ -61,6 +79,24 @@ public class ConsultaControllerTest {
 	String token;
 
 	void clearEntitys() {
+		usuarioCorrect = new Usuario();
+		usuarioCorrect.setNome("Nome de usuário");
+		usuarioCorrect.setEmail("usuario@teste.com");
+		usuarioCorrect.setDataNascimento(java.sql.Date.valueOf(LocalDate.of(1980, 10, 10)));
+		usuarioCorrect.setTelefone("(48) 9 9999-9999");
+		usuarioCorrect.setCpf("000.000.000-00");
+		usuarioCorrect.setPassword("12341234");
+		usuarioCorrect.setPerfil(Perfil.MEDICO);
+
+		usuarioWrongMail = new Usuario();
+		usuarioWrongMail.setNome("Nome de usuário");
+		usuarioWrongMail.setEmail("usuarioteste.com");
+		usuarioWrongMail.setDataNascimento(java.sql.Date.valueOf(LocalDate.of(1980, 10, 10)));
+		usuarioWrongMail.setTelefone("(48) 9 9999-9999");
+		usuarioWrongMail.setCpf("000.000.000-00");
+		usuarioWrongMail.setPassword("12341234");
+		usuarioWrongMail.setPerfil(Perfil.MEDICO);
+
 		usuarioPaciente = new Usuario();
 		usuarioPaciente.setNome("Nome de usuário");
 		usuarioPaciente.setEmail("carlos.souza@example.com");
@@ -78,7 +114,7 @@ public class ConsultaControllerTest {
 		consulta.setIssueDescription("Paciente relatou dores de cabeça frequentes e cansaço.");
 		consulta.setPrescribedMedication("Paracetamol 500mg");
 		consulta.setObservation("Recomendada hidratação e repouso.");
-		
+
 		putConsulta = new ConsultaDto();
 
 		putConsulta.setReason("Check-up anual");
@@ -122,6 +158,24 @@ public class ConsultaControllerTest {
 		paciente.setInsuranceNumber("9876543210");
 		paciente.setInsuranceExpiration(new Date(126, 5, 30));
 
+		putPaciente = new PacienteDto();
+
+		putPaciente.setName("Carlos Souza");
+		putPaciente.setGender("Masculino");
+		putPaciente.setBirthDate(new Date(85, 3, 25));
+		putPaciente.setCPF("987.654.321-00");
+		putPaciente.setRG("SP-43.210.987");
+		putPaciente.setMaritalStatus("Casado");
+		putPaciente.setPhone("(11) 9 8765-4321");
+		putPaciente.setEmail("carlos.souza@example.com");
+		putPaciente.setBirthCity("São Paulo");
+		putPaciente.setEmergencyContact("(11) 9 8765-4321");
+		putPaciente.setAllergies("Nenhuma");
+		putPaciente.setSpecialCare("Nenhum");
+		putPaciente.setInsuranceCompany("Bradesco Saúde");
+		putPaciente.setInsuranceNumber("9876543210");
+		putPaciente.setInsuranceExpiration(new Date(126, 5, 30));
+
 		Endereco endereco = new Endereco();
 
 		endereco.setCEP("38400-000");
@@ -144,99 +198,71 @@ public class ConsultaControllerTest {
 	};
 
 	@Test
-	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA DE USUÁRIOS")
-	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO", "PACIENTE" })
+	@DisplayName("LISTAR PACIENTES - 200 - OBTÉM LISTA DOS PACIENTES")
 	void list_200() throws Exception {
-		when(service.all()).thenReturn(List.of(consulta));
+		when(service.all()).thenReturn(List.of(paciente));
 
 		var resp = controller.list(Map.of());
-
-		var consultaResp = resp.getBody().getContent().get(0);
+		var body = resp.getBody().getContent().get(0);
 
 		verify(service).all();
 
 		assertNotNull(resp);
-		assertEquals("200 OK", resp.getStatusCode().toString());
-		assertEquals(consultaResp.getReason(), consulta.getReason());
+		assertEquals(paciente.getName(), body.getName());
 	}
 
 	@Test
-	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA DE USUÁRIOS COM FILTRO REASON")
-	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO", "PACIENTE" })
+	@DisplayName("LISTAR PACIENTES - 200 - OBTÉM LISTA DOS PACIENTES COM FILTRO")
 	void list_200_withFilter() throws Exception {
-		when(service.paged(any(), any())).thenReturn(new PageImpl(List.of(consulta)));
+		when(service.paged(any(), any())).thenReturn(new PageImpl(List.of(paciente)));
 
-		var resp = controller.list(Map.of("reason", consulta.getReason()));
-		var consultaResp = resp.getBody().getContent().get(0);
+		var resp = controller.list(Map.of("name", paciente.getName()));
+		var body = resp.getBody().getContent().get(0);
 
 		verify(service).paged(any(), any());
 
 		assertNotNull(resp);
-		assertEquals("200 OK", resp.getStatusCode().toString());
-		assertEquals(consultaResp.getReason(), consulta.getReason());
+		assertEquals(paciente.getName(), body.getName());
 	}
 
 	@Test
-	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA DE USUÁRIOS COM FILTRO REASON")
-	void list_404_withFilter() throws Exception {
-		when(service.paged(any(), any())).thenReturn(new PageImpl(List.of()));
+	@DisplayName("CONSULTA PACIENTE - 200 - OBTÉM PACIENTE DETERMINADO")
+	void get_200() throws Exception {
+		when(service.get(anyLong())).thenReturn(paciente);
 
-		var resp = controller.list(Map.of("reason", consulta.getReason() + "xx"));
+		var resp = controller.get(1L);
+		var body = (Paciente) resp.getBody();
 
-		verify(service).paged(any(), any());
+		verify(service).get(anyLong());
+
+		assertNotNull(resp);
+		assertEquals(paciente.getName(), body.getName());
+	}
+
+	@Test
+	@DisplayName("CONSULTA PACIENTE - 200 - OBTÉM PACIENTE DETERMINADO")
+	void put_200() throws Exception {
+		when(service.get(anyLong())).thenReturn(paciente);
+		when(service.alter(anyLong(), any())).thenReturn(paciente);
+
+		var resp = controller.put(1L, putPaciente);
+		var body = (Paciente) resp.getBody();
+
+		verify(service).get(anyLong());
+		verify(service).alter(anyLong(), any());
 
 		assertNotNull(resp);
 		assertNull(resp.getBody());
-		assertEquals("404 NOT_FOUND", resp.getStatusCode().toString());
 	}
 
 	@Test
-	@DisplayName("CRIA CONSULTA - 201 - CADASTRAR CONSULTA")
-	void post_201() throws Exception {
-		when(patientService.get(anyLong())).thenReturn(paciente);
-		when(service.create(any(Consulta.class))).thenReturn(consulta);
-		
-		var resp = controller.post(consultaDto);
-		var body = (Consulta) resp.getBody();
-		
-		verify(patientService).get(anyLong());
-		
-		assertNotNull(resp);
-		assertEquals(consulta.getReason(), body.getReason());
-		assertEquals(HttpStatus.CREATED.value(), resp.getStatusCode().value());
-	}
-	
-	@Test
-	@DisplayName("ATUALIZA CONSULTA - 200 - ATUALIZA CONSULTA ESPECÍFICA")
-	void put_200() throws Exception {
-		when(patientService.get(anyLong())).thenReturn(paciente);
-		when(service.get(anyLong())).thenReturn(consulta);
-		when(service.alter(anyLong(), any())).thenReturn(consulta);
-		
-		var resp = controller.put(1L, putConsulta);
-		var body = (Consulta) resp.getBody();
-
-		verify(patientService).get(anyLong());
-		verify(service).get(anyLong());
-		verify(service).alter(anyLong(), any());
-		
-		assertNotNull(resp);
-		assertEquals(consulta.getReason(), body.getReason());
-		assertEquals(HttpStatus.OK.value(), resp.getStatusCode().value());
-	}
-
-
-	@Test
-	@DisplayName("DELETA CONSULTA - 204 - APAGA CONSULTA ESPECÍFICA")
-	void delete_204() throws Exception {
+	@DisplayName("EXCLUI PACIENTE - 200 - REMOVE PACIENTE DETERMINADO")
+	void delete_200() throws Exception {
 		when(service.delete(anyLong())).thenReturn(true);
-		
-		var resp = controller.delete(1L);
 
-		verify(service).delete(anyLong());
+		controller.delete(1L);
 		
-		assertNotNull(resp);
-		assertEquals(HttpStatus.NO_CONTENT.value(), resp.getStatusCode().value());
+		verify(service).delete(anyLong());
 	}
 
 }
