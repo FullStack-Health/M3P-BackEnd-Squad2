@@ -8,12 +8,12 @@ public class LoginRequestDTO {
 
 	@NotNull
     @Email
-    @Schema(description = "Username of the user, must be a valid email address", 
+    @Schema(description = "Nome do usuário, deve ser um e-mail válido", 
             example = "user@example.com")
     private String username;
 
     @NotNull
-    @Schema(description = "Password of the user, must not be null", 
+    @Schema(description = "Senha do usuário, deve ser não nula", 
             example = "P@ssw0rd!")
     private String password;
 

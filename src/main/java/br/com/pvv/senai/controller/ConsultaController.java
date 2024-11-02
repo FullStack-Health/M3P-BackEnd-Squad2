@@ -18,6 +18,9 @@ import br.com.pvv.senai.model.dto.ConsultaDto;
 import br.com.pvv.senai.service.ConsultaService;
 import br.com.pvv.senai.service.GenericService;
 import br.com.pvv.senai.service.PacienteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
@@ -41,7 +44,10 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 	}
 
 	@Override
-	public ResponseEntity post(@Valid ConsultaDto model) throws DtoToEntityException, Exception {
+	@Operation(summary = "Cadastrar consulta" , description = "Realiza o cadastro da entidade consulta.", security = { @SecurityRequirement(name = "bearer-key") })
+	public ResponseEntity post(
+			@Parameter(description = "Dados da consulta a ser cadastrada.")
+			@Valid ConsultaDto model) throws DtoToEntityException, Exception {
 		var id = model.getPatientId();
 		var patient = patientService.get(id);
 		if (patient == null)
@@ -54,7 +60,10 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 	}
 
 	@Override
-	public ResponseEntity get(Long id) {
+	@Operation(summary = "Consultar consulta" , description = "Realiza a consulta de determinada consulta", security = { @SecurityRequirement(name = "bearer-key") })
+	public ResponseEntity get(
+			@Parameter(description = "Identificador da consulta a ser consultada")
+			Long id) {
 		var retorno = getService().get(id);
 		if (retorno == null)
 			return ResponseEntity.notFound().build();
@@ -63,7 +72,12 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 	}
 
 	@Override
-	public ResponseEntity put(Long id, @Valid ConsultaDto model)
+	@Operation(summary = "Atualiza consulta", description = "Realiza a atualização de determinada consulta", security = { @SecurityRequirement(name = "bearer-key") })
+	public ResponseEntity put(
+			@Parameter(description = "Identificador da consulta a ser atualizada")
+			Long id,
+			@Parameter(description = "Dados da consulta a serem atualizados")
+			@Valid ConsultaDto model)
 			throws DtoToEntityException, PacienteNotFoundException {
 		if (getService().get(id) == null)
 			return ResponseEntity.notFound().build();
