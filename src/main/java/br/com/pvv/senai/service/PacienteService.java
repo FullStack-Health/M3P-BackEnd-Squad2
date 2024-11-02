@@ -40,11 +40,16 @@ public class PacienteService extends GenericService<Paciente> {
 
 	@Override
 	public Paciente alter(long id, Paciente model) {
+		userService.getRepository().flush();
 		model.setId(id);
 		var endereco = model.getAddress();
 		if (endereco != null && endereco.getId() == 0)
 			endereco = this.enderecoService.create(model.getAddress());
-		var usuario = this.userService.findByEmail(model.getEmail()).get();
+		System.out.println("Id que esta sendo passado: " + id);
+		Usuario userAntigo = this.repository.findById(id).get().getUsuario();
+		System.out.println("Usuario: " + userAntigo.getNome());
+		var usuario = this.userService.findByEmail(userAntigo.getEmail()).get();
+
 		
 		String cpfLimpo = model.getCPF().replaceAll("[^\\d]", "");
 		usuario.setPerfil(Perfil.PACIENTE);
@@ -56,6 +61,7 @@ public class PacienteService extends GenericService<Paciente> {
 		usuario.setCpf(cpfLimpo);
 		userService.alter(usuario.getId(), usuario);
 		model.setUsuario(usuario);
+		userService.getRepository().flush();
 		
 		var retorno = super.alter(id ,model);
 //		usuario.setPassword(null); -> applied @JsonIgnore
