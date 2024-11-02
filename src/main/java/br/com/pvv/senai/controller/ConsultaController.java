@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.pvv.senai.controller.filter.ConsultaFilter;
 import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.entity.Paciente;
@@ -28,7 +29,7 @@ import jakarta.validation.Valid;
 public class ConsultaController extends GenericController<ConsultaDto, Consulta> {
 
 	@Autowired
-	private ConsultaService service;
+	ConsultaService service;
 
 	@Autowired
 	private PacienteService patientService;
@@ -40,7 +41,7 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 
 	@Override
 	public IFilter<Consulta> filterBuilder(Map<String, String> params) throws NotRequiredByProjectException {
-		throw new NotRequiredByProjectException();
+		return new ConsultaFilter(params);
 	}
 
 	@Override
@@ -86,7 +87,7 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 		if (patient == null)
 			throw new PacienteNotFoundException(model.getPatientId());
 
-		patient = (Paciente) ((HibernateProxy) patient).getHibernateLazyInitializer().getImplementation();
+//		patient = (Paciente) ((HibernateProxy) patient).getHibernateLazyInitializer().getImplementation();
 
 		var entity = model.makeEntity();
 		entity.setPatient(patient);
