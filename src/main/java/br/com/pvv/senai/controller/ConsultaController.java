@@ -2,7 +2,6 @@ package br.com.pvv.senai.controller;
 
 import java.util.Map;
 
-import org.hibernate.proxy.HibernateProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +11,7 @@ import br.com.pvv.senai.controller.filter.ConsultaFilter;
 import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.entity.Paciente;
+import br.com.pvv.senai.exceptions.ConsultaNotFoundException;
 import br.com.pvv.senai.exceptions.DtoToEntityException;
 import br.com.pvv.senai.exceptions.NotRequiredByProjectException;
 import br.com.pvv.senai.exceptions.PacienteNotFoundException;
@@ -45,10 +45,10 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 	}
 
 	@Override
-	@Operation(summary = "Cadastrar consulta" , description = "Realiza o cadastro da entidade consulta.", security = { @SecurityRequirement(name = "bearer-key") })
-	public ResponseEntity post(
-			@Parameter(description = "Dados da consulta a ser cadastrada.")
-			@Valid ConsultaDto model) throws DtoToEntityException, Exception {
+	@Operation(summary = "Cadastrar consulta", description = "Realiza o cadastro da entidade consulta.", security = {
+			@SecurityRequirement(name = "bearer-key") })
+	public ResponseEntity post(@Parameter(description = "Dados da consulta a ser cadastrada.") @Valid ConsultaDto model)
+			throws DtoToEntityException, Exception {
 		var id = model.getPatientId();
 		var patient = patientService.get(id);
 		if (patient == null)
@@ -61,10 +61,9 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 	}
 
 	@Override
-	@Operation(summary = "Consultar consulta" , description = "Realiza a consulta de determinada consulta", security = { @SecurityRequirement(name = "bearer-key") })
-	public ResponseEntity get(
-			@Parameter(description = "Identificador da consulta a ser consultada")
-			Long id) {
+	@Operation(summary = "Consultar consulta", description = "Realiza a consulta de determinada consulta", security = {
+			@SecurityRequirement(name = "bearer-key") })
+	public ResponseEntity get(@Parameter(description = "Identificador da consulta a ser consultada") Long id) {
 		var retorno = getService().get(id);
 		if (retorno == null)
 			return ResponseEntity.notFound().build();
@@ -73,12 +72,10 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 	}
 
 	@Override
-	@Operation(summary = "Atualiza consulta", description = "Realiza a atualização de determinada consulta", security = { @SecurityRequirement(name = "bearer-key") })
-	public ResponseEntity put(
-			@Parameter(description = "Identificador da consulta a ser atualizada")
-			Long id,
-			@Parameter(description = "Dados da consulta a serem atualizados")
-			@Valid ConsultaDto model)
+	@Operation(summary = "Atualiza consulta", description = "Realiza a atualização de determinada consulta", security = {
+			@SecurityRequirement(name = "bearer-key") })
+	public ResponseEntity put(@Parameter(description = "Identificador da consulta a ser atualizada") Long id,
+			@Parameter(description = "Dados da consulta a serem atualizados") @Valid ConsultaDto model)
 			throws DtoToEntityException, PacienteNotFoundException {
 		if (getService().get(id) == null)
 			return ResponseEntity.notFound().build();
@@ -86,8 +83,6 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 		Paciente patient = patientService.get(model.getPatientId());
 		if (patient == null)
 			throw new PacienteNotFoundException(model.getPatientId());
-
-//		patient = (Paciente) ((HibernateProxy) patient).getHibernateLazyInitializer().getImplementation();
 
 		var entity = model.makeEntity();
 		entity.setPatient(patient);
