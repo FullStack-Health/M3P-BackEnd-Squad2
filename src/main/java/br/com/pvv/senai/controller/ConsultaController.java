@@ -80,11 +80,6 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 		if (getService().get(id) == null)
 			return ResponseEntity.notFound().build();
 
-		Consulta existingConsulta = getService().get(id);
-		if (existingConsulta == null) {
-			throw new ConsultaNotFoundException();
-		}
-
 		Paciente patient = patientService.get(model.getPatientId());
 		if (patient == null)
 			throw new PacienteNotFoundException(model.getPatientId());
