@@ -1,16 +1,21 @@
 package br.com.pvv.senai.controller;
 
-import br.com.pvv.senai.entity.Consulta;
-import br.com.pvv.senai.entity.Endereco;
-import br.com.pvv.senai.entity.Paciente;
-import br.com.pvv.senai.entity.Usuario;
-import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.model.dto.PacienteDto;
-import br.com.pvv.senai.security.SecurityFilter;
-import br.com.pvv.senai.security.UsuarioService;
-import br.com.pvv.senai.service.ConsultaService;
-import br.com.pvv.senai.service.ExameService;
-import br.com.pvv.senai.service.PacienteService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,17 +30,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
+import br.com.pvv.senai.entity.Consulta;
+import br.com.pvv.senai.entity.Endereco;
+import br.com.pvv.senai.entity.Paciente;
+import br.com.pvv.senai.entity.Usuario;
+import br.com.pvv.senai.enums.Perfil;
+import br.com.pvv.senai.model.dto.PacienteDto;
+import br.com.pvv.senai.security.SecurityFilter;
+import br.com.pvv.senai.security.UsuarioService;
+import br.com.pvv.senai.service.ConsultaService;
+import br.com.pvv.senai.service.ExameService;
+import br.com.pvv.senai.service.PacienteService;
 
 @AutoConfigureMockMvc
 @WebMvcTest(PacienteController.class)
@@ -61,7 +66,7 @@ public class PacienteControllerTest {
 	SecurityFilter securityFilter;
 
 	Usuario usuarioPaciente;
-	PacienteDto putPaciente;
+	PacienteDto pacienteDto;
 	Paciente paciente;
 
 	Consulta consulta;
@@ -87,10 +92,6 @@ public class PacienteControllerTest {
 		consulta.setPrescribedMedication("Paracetamol 500mg");
 		consulta.setObservation("Recomendada hidratação e repouso.");
 
-		PacienteDto pacienteDto = new PacienteDto();
-		pacienteDto.setId(67890);
-		pacienteDto.setName("Ana Pereira");
-
 		paciente = new Paciente();
 
 		paciente.setName("Carlos Souza");
@@ -109,23 +110,23 @@ public class PacienteControllerTest {
 		paciente.setInsuranceNumber("9876543210");
 		paciente.setInsuranceExpiration(new Date(126, 5, 30));
 
-		putPaciente = new PacienteDto();
+		pacienteDto = new PacienteDto();
 
-		putPaciente.setName("Carlos Souza");
-		putPaciente.setGender("Masculino");
-		putPaciente.setBirthDate(new Date(85, 3, 25));
-		putPaciente.setCPF("987.654.321-00");
-		putPaciente.setRG("SP-43.210.987");
-		putPaciente.setMaritalStatus("Casado");
-		putPaciente.setPhone("(11) 9 8765-4321");
-		putPaciente.setEmail("carlos.souza@example.com");
-		putPaciente.setBirthCity("São Paulo");
-		putPaciente.setEmergencyContact("(11) 9 8765-4321");
-		putPaciente.setAllergies("Nenhuma");
-		putPaciente.setSpecialCare("Nenhum");
-		putPaciente.setInsuranceCompany("Bradesco Saúde");
-		putPaciente.setInsuranceNumber("9876543210");
-		putPaciente.setInsuranceExpiration(new Date(126, 5, 30));
+		pacienteDto.setName("Carlos Souza");
+		pacienteDto.setGender("Masculino");
+		pacienteDto.setBirthDate(new Date(85, 3, 25));
+		pacienteDto.setCPF("987.654.321-00");
+		pacienteDto.setRG("SP-43.210.987");
+		pacienteDto.setMaritalStatus("Casado");
+		pacienteDto.setPhone("(11) 9 8765-4321");
+		pacienteDto.setEmail("carlos.souza@example.com");
+		pacienteDto.setBirthCity("São Paulo");
+		pacienteDto.setEmergencyContact("(11) 9 8765-4321");
+		pacienteDto.setAllergies("Nenhuma");
+		pacienteDto.setSpecialCare("Nenhum");
+		pacienteDto.setInsuranceCompany("Bradesco Saúde");
+		pacienteDto.setInsuranceNumber("9876543210");
+		pacienteDto.setInsuranceExpiration(new Date(126, 5, 30));
 
 		Endereco endereco = new Endereco();
 
@@ -147,6 +148,24 @@ public class PacienteControllerTest {
 	void setup() {
 		clearEntitys();
 	};
+	
+	@Test
+	@DisplayName("CADASTRAR PACIENTES - 200 - CADASTRA UM DETERMINAOD PACIENTE")
+	void post_200() throws Exception {
+		when(usuarioService.has(any(String.class))).thenReturn(false);
+		when(usuarioService.create(any(Usuario.class))).thenReturn(usuarioPaciente);
+		when(service.create(any(Paciente.class))).thenReturn(paciente);
+
+		var resp = controller.post(pacienteDto);
+		var body = (Paciente) resp.getBody();
+
+		verify(usuarioService).has(any(String.class));
+		verify(usuarioService).create(any(Usuario.class));
+		verify(service).create(any(Paciente.class));
+
+		assertNotNull(resp);
+		assertEquals(paciente.getName(), body.getName());
+	}
 
 	@Test
 	@DisplayName("LISTAR PACIENTES - 200 - OBTÉM LISTA DOS PACIENTES")
@@ -211,7 +230,7 @@ public class PacienteControllerTest {
 		when(service.get(anyLong())).thenReturn(paciente);
 		when(service.alter(anyLong(), any())).thenReturn(paciente);
 
-		var resp = controller.put(1L, putPaciente);
+		var resp = controller.put(1L, pacienteDto);
 		var body = (Paciente) resp.getBody();
 
 		verify(service).get(anyLong());
