@@ -34,7 +34,6 @@ public class PacienteService extends GenericService<Paciente> {
 		var usuario = this.userService.findByEmail(model.getEmail()).get();
 		model.setUsuario(usuario);
 		var retorno = super.create(model);
-//		usuario.setPassword(null); -> applied @JsonIgnore
 		return retorno;
 	}
 
@@ -45,12 +44,9 @@ public class PacienteService extends GenericService<Paciente> {
 		var endereco = model.getAddress();
 		if (endereco != null && endereco.getId() == 0)
 			endereco = this.enderecoService.create(model.getAddress());
-		System.out.println("Id que esta sendo passado: " + id);
 		Usuario userAntigo = this.repository.findById(id).get().getUsuario();
-		System.out.println("Usuario: " + userAntigo.getNome());
 		var usuario = this.userService.findByEmail(userAntigo.getEmail()).get();
 
-		
 		String cpfLimpo = model.getCPF().replaceAll("[^\\d]", "");
 		usuario.setPerfil(Perfil.PACIENTE);
 		usuario.setEmail(model.getEmail());
@@ -64,7 +60,6 @@ public class PacienteService extends GenericService<Paciente> {
 		userService.getRepository().flush();
 		
 		var retorno = super.alter(id ,model);
-//		usuario.setPassword(null); -> applied @JsonIgnore
 		return retorno;
 	}
 
