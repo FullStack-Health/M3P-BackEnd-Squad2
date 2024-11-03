@@ -1,30 +1,5 @@
 package br.com.pvv.senai.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
-
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.entity.Endereco;
 import br.com.pvv.senai.entity.Paciente;
@@ -36,6 +11,31 @@ import br.com.pvv.senai.security.UsuarioService;
 import br.com.pvv.senai.service.ConsultaService;
 import br.com.pvv.senai.service.ExameService;
 import br.com.pvv.senai.service.PacienteService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @AutoConfigureMockMvc
 @WebMvcTest(PacienteController.class)
@@ -49,7 +49,7 @@ public class PacienteControllerTest {
 	PacienteService service;
 
 	@MockBean
-	UsuarioService userService;
+	UsuarioService usuarioService;
 
 	@MockBean
 	ExameService exameService;
@@ -179,6 +179,21 @@ public class PacienteControllerTest {
 	@Test
 	@DisplayName("CONSULTA PACIENTE - 200 - OBTÉM PACIENTE DETERMINADO")
 	void get_200() throws Exception {
+		Authentication authentication = mock(Authentication.class);
+		when(authentication.getName()).thenReturn("mockUser");
+
+		org.springframework.security.core.context.SecurityContext securityContext = mock(SecurityContext.class);
+		SecurityContextHolder.setContext(securityContext);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+
+		// Mock user service to return an authenticated user
+		Usuario usuarioAutenticado = mock(Usuario.class);
+		Paciente pacienteMock = mock(Paciente.class);
+		when(pacienteMock.getId()).thenReturn(1L);
+		when(usuarioAutenticado.getPaciente()).thenReturn(pacienteMock);
+		when(usuarioAutenticado.getPerfil()).thenReturn(Perfil.PACIENTE);
+		when(usuarioService.findByEmail("mockUser")).thenReturn(Optional.of(usuarioAutenticado));
+
 		when(service.get(anyLong())).thenReturn(paciente);
 
 		var resp = controller.get(1L);
