@@ -19,6 +19,8 @@ public class EnderecoDto extends GenericDto<Endereco> {
     private String complemento;
     @Schema(description = "Nome do bairro", example = "Bela Vista")
     private String bairro;
+	@Schema(description = "Estado do endereço", example = "SP")
+	private String estado;
     @Schema(description = "Ponto de referência próximo ao endereço", example = "Próximo ao MASP")
     private String pontoDeReferencia;
 	
@@ -82,6 +84,14 @@ public class EnderecoDto extends GenericDto<Endereco> {
 
 	public void setBairro(String bairro) {
 		this.bairro = bairro;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
 	}
 
 	public String getPontoDeReferencia() {
