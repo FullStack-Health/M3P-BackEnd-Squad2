@@ -43,11 +43,11 @@ public class SecurityConfig {
 
 	@Autowired
 	private SecurityFilter secFilter;
-	
+
 	UrlBasedCorsConfigurationSource apiConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(Arrays.asList("https://**"));
-		configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT", "DELETE"));
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
@@ -55,19 +55,18 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		
-		http
-			.cors(Customizer.withDefaults());
-		
-		http
-			.csrf(csrf -> csrf.disable())
+
+		http.cors(Customizer.withDefaults());
+
+		http.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
 						// GUEST
 						.requestMatchers( //
 								"/login", //
 								"/usuarios/pre-registro", //
-								"/usuarios/email/{email}/redefinir-senha"//
+								"/usuarios/email/{email}/redefinir-senha", //
+								"/swagger-ui" //
 						).permitAll()
 						// pacientes
 						.requestMatchers(HttpMethod.GET, //
@@ -102,7 +101,7 @@ public class SecurityConfig {
 //								"/consultas/{id}", //
 								"/pacientes", //
 								"/pacientes/{id}", //
-								"/usuarios", "/consultas", //
+								"/consultas", //
 								"/exames" //
 						).hasAuthority(Perfil.MEDICO.scope())
 
@@ -124,7 +123,8 @@ public class SecurityConfig {
 								"/pacientes/{id}", //
 								"/usuarios/{id}")
 						.hasAuthority(Perfil.ADMIN.scope()).requestMatchers(HttpMethod.GET, //
-								"/usuarios/{id}"
+								"/usuarios/{id}", //
+								"/usuarios" //
 //								"/dashboard**", //
 //								"/pacientes/{id}/prontuarios", //
 //								"/pacientes/prontuarios", //

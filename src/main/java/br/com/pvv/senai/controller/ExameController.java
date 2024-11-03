@@ -2,7 +2,6 @@ package br.com.pvv.senai.controller;
 
 import java.util.Map;
 
-import br.com.pvv.senai.exceptions.ExameNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,11 +11,15 @@ import br.com.pvv.senai.controller.filter.ExameFilter;
 import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.entity.Exame;
 import br.com.pvv.senai.exceptions.DtoToEntityException;
+import br.com.pvv.senai.exceptions.ExameNotFoundException;
 import br.com.pvv.senai.exceptions.PacienteNotFoundException;
 import br.com.pvv.senai.model.dto.ExameDto;
 import br.com.pvv.senai.service.ExameService;
 import br.com.pvv.senai.service.GenericService;
 import br.com.pvv.senai.service.PacienteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
@@ -40,7 +43,10 @@ public class ExameController extends GenericController<ExameDto, Exame> {
 	}
 
 	@Override
-	public ResponseEntity post(@Valid ExameDto model) throws DtoToEntityException, Exception {
+	@Operation(summary = "Cadastro de exames", description = "Realizar o cadastro da entidade (exame) no banco de dados", security = { @SecurityRequirement(name = "bearer-key") })
+	public ResponseEntity post(
+			@Parameter(description = "Dados referentes a entidade que serão armazenados no banco de dados", required = true) @Valid ExameDto model)
+			throws DtoToEntityException, Exception {
 		var patient = patientService.get(model.getPatientId());
 		if (patient == null)
 			throw new PacienteNotFoundException(model.getPatientId());
@@ -52,19 +58,19 @@ public class ExameController extends GenericController<ExameDto, Exame> {
 		return ResponseEntity.status(201).body(entity);
 	}
 
-@Override
-	public ResponseEntity put(Long id, @Valid ExameDto model)
-		throws DtoToEntityException, ExameNotFoundException,  PacienteNotFoundException{
+	@Override
+	@Operation(summary = "Atualização de exames", description = "Realizar a atualização da entidade (exame) no banco de dados", security = { @SecurityRequirement(name = "bearer-key") })
+	public ResponseEntity put(
+			@Parameter(description = "Identificador da entidade (exame) a ser atualizado.", required = true) Long id,
+			@Parameter(description = "Novo conteúdo da entidade a ser atualizado.", required = true) @Valid ExameDto model)
+			throws DtoToEntityException, ExameNotFoundException, PacienteNotFoundException {
 
-	System.out.println("ID do exame a ser atualizado: " + id);
-	System.out.println("ID do paciente recebido: " + model.getPatientId());
+		Exame existingExame = getService().get(id);
+		if (existingExame == null) {
+			throw new ExameNotFoundException();
+		}
 
-	Exame existingExame = getService().get(id);
-	if (existingExame == null) {
-		throw new ExameNotFoundException();
-	}
-
-	var patient = patientService.get(model.getPatientId());
+		var patient = patientService.get(model.getPatientId());
 		if (patient == null)
 			throw new PacienteNotFoundException(model.getPatientId());
 
@@ -76,6 +82,4 @@ public class ExameController extends GenericController<ExameDto, Exame> {
 		return ResponseEntity.ok(entity);
 	}
 
-
 }
-
