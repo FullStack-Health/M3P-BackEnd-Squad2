@@ -1,19 +1,15 @@
 package br.com.pvv.senai.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import br.com.pvv.senai.entity.*;
+import br.com.pvv.senai.enums.Perfil;
+import br.com.pvv.senai.model.dto.ConsultaDto;
+import br.com.pvv.senai.model.dto.ExameDto;
+import br.com.pvv.senai.model.dto.PacienteDto;
+import br.com.pvv.senai.security.SecurityFilter;
+import br.com.pvv.senai.security.UsuarioService;
+import br.com.pvv.senai.service.ConsultaService;
+import br.com.pvv.senai.service.ExameService;
+import br.com.pvv.senai.service.PacienteService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,21 +20,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import br.com.pvv.senai.entity.Consulta;
-import br.com.pvv.senai.entity.Endereco;
-import br.com.pvv.senai.entity.Exame;
-import br.com.pvv.senai.entity.Paciente;
-import br.com.pvv.senai.entity.Usuario;
-import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.model.dto.ConsultaDto;
-import br.com.pvv.senai.model.dto.ExameDto;
-import br.com.pvv.senai.model.dto.PacienteDto;
-import br.com.pvv.senai.security.SecurityFilter;
-import br.com.pvv.senai.security.UsuarioService;
-import br.com.pvv.senai.service.ConsultaService;
-import br.com.pvv.senai.service.ExameService;
-import br.com.pvv.senai.service.PacienteService;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
@@ -53,8 +51,8 @@ public class ExameControllerTest {
 	@Mock
 	PacienteService patientService;
 
-	@MockBean
-	UsuarioService userService;
+	@Mock
+	UsuarioService usuarioService;
 
 	@MockBean
 	ExameService exameService;
@@ -222,9 +220,24 @@ public class ExameControllerTest {
 		clearEntitys();
 	};
 
+	void authenticationMock(){
+		Authentication authentication = mock(Authentication.class);
+		when(authentication.getName()).thenReturn("mockUser");
+		SecurityContext securityContext = mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+
+		Usuario usuarioAutenticado = mock(Usuario.class);
+		when(usuarioAutenticado.getPerfil()).thenReturn(Perfil.ADMIN);
+		when(usuarioService.findByEmail("mockUser")).thenReturn(Optional.of(usuarioAutenticado));
+	}
+
 	@Test
 	@DisplayName("LISTAR EXAME - 200 - OBTÉM LISTA DOS EXAMES")
 	void list_200() throws Exception {
+
+		this.authenticationMock();
+
 		when(service.all()).thenReturn(List.of(exame));
 
 		var resp = controller.list(Map.of());
@@ -239,6 +252,9 @@ public class ExameControllerTest {
 	@Test
 	@DisplayName("LISTAR EXAMES - 200 - OBTÉM LISTA DOS EXAMES COM FILTRO")
 	void list_200_withFilter() throws Exception {
+
+		this.authenticationMock();
+
 		when(service.paged(any(), any())).thenReturn(new PageImpl(List.of(exame)));
 
 		var resp = controller.list(Map.of("name", exame.getNome()));
@@ -253,6 +269,9 @@ public class ExameControllerTest {
 	@Test
 	@DisplayName("CONSULTA EXAME - 200 - OBTÉM EXAMES DETERMINADO")
 	void get_200() throws Exception {
+
+		this.authenticationMock();
+
 		when(service.get(anyLong())).thenReturn(exame);
 
 		var resp = controller.get(1L);
