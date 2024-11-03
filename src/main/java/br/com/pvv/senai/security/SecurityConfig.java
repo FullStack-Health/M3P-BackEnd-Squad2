@@ -72,6 +72,8 @@ public class SecurityConfig {
 						.requestMatchers(HttpMethod.GET, //
 								"/pacientes/{id}", //
 								"/consultas/{id}", //
+								"/consultas", //
+								"/exames", //
 								"/exames/{id}", //
 								"/usuarios/me" //
 						).hasAuthority(Perfil.PACIENTE.scope())
@@ -98,7 +100,7 @@ public class SecurityConfig {
 //								"/exames/{id}", //
 //								"/consultas/{id}", //
 								"/pacientes", //
-//								"/pacientes/{id}", //
+								"/pacientes/{id}", //
 								"/consultas", //
 								"/exames" //
 						).hasAuthority(Perfil.MEDICO.scope())
