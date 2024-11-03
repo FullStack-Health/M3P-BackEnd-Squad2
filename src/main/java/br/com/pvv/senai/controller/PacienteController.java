@@ -82,14 +82,6 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 		return new PacienteFilter(params);
 	}
 
-//	@GetMapping("prontuarios")
-//	public List<Prontuario> getProntuario(@RequestParam Map<String, String> params) {
-//		var filter = new ProntuarioFilter(params);
-//		var paged = service.paged(filter.example(), filter.getPagination());
-//		var retorno = paged.map(x -> new Prontuario(x.getId(), x.getName(), x.getInsuranceCompany())).toList();
-//		return retorno;
-//	}
-
 	@GetMapping("prontuarios")
 	@Operation(summary = "Consulta prontuários", description = "Obtém os dados do prontuário dos pacientes.", security = { @SecurityRequirement(name = "bearer-key") })
 	public ResponseEntity<Page<ProntuarioDto>> list(
@@ -106,9 +98,7 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 		if (retorno.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
-
 		return ResponseEntity.ok(retorno);
-
 	}
 
 	@GetMapping("{id}/prontuarios")
@@ -121,12 +111,6 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 		if (paciente == null)
 			return ResponseEntity.notFound().build();
 
-//		var retorno = new ProntuarioDetails();
-
-//		retorno.setNome(paciente.getName());
-//		retorno.setCttDeEmergencia(paciente.getEmergencyContact());
-//		retorno.setConvenio(paciente.getInsuranceCompany());
-//
 		var exames = exameService.findByPacienteId(paciente.getId());
 		exames.sort(Comparator.comparing(Exame::getDataExame));
 

@@ -1,23 +1,11 @@
 package br.com.pvv.senai.controller;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.not;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
+import br.com.pvv.senai.entity.Usuario;
+import br.com.pvv.senai.enums.Perfil;
+import br.com.pvv.senai.repository.UserRepository;
+import br.com.pvv.senai.security.TokenService;
+import br.com.pvv.senai.security.UsuarioService;
+import br.com.pvv.senai.service.PacienteService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,12 +18,19 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import br.com.pvv.senai.entity.Usuario;
-import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.repository.UserRepository;
-import br.com.pvv.senai.security.TokenService;
-import br.com.pvv.senai.security.UsuarioService;
-import br.com.pvv.senai.service.PacienteService;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @WebMvcTest(UsuarioController.class)
@@ -55,12 +50,6 @@ class UsuarioControllerTest {
 
 	@MockBean
 	UserRepository repository;
-
-//	@MockBean
-//	private SecurityFilter securityFilter;
-//
-//	@MockBean
-//	private SecurityConfig securityConfig;
 
 	Usuario usuarioCorrect;
 	Usuario usuarioWrongMail;
