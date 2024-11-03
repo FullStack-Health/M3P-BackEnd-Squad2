@@ -1,21 +1,16 @@
 package br.com.pvv.senai.controller;
 
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import br.com.pvv.senai.controller.filter.ConsultaFilter;
 import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.entity.Consulta;
 import br.com.pvv.senai.entity.Paciente;
-import br.com.pvv.senai.exceptions.ConsultaNotFoundException;
+import br.com.pvv.senai.entity.Usuario;
+import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.exceptions.DtoToEntityException;
 import br.com.pvv.senai.exceptions.NotRequiredByProjectException;
 import br.com.pvv.senai.exceptions.PacienteNotFoundException;
 import br.com.pvv.senai.model.dto.ConsultaDto;
+import br.com.pvv.senai.security.UsuarioService;
 import br.com.pvv.senai.service.ConsultaService;
 import br.com.pvv.senai.service.GenericService;
 import br.com.pvv.senai.service.PacienteService;
@@ -23,16 +18,35 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/consultas")
 public class ConsultaController extends GenericController<ConsultaDto, Consulta> {
+
+	private static final Logger logger = LoggerFactory.getLogger(ConsultaController.class);
 
 	@Autowired
 	ConsultaService service;
 
 	@Autowired
 	private PacienteService patientService;
+
+	@Autowired
+	private UsuarioService usuarioService;
 
 	@Override
 	public GenericService<Consulta> getService() {
@@ -64,9 +78,24 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 	@Operation(summary = "Consultar consulta", description = "Realiza a consulta de determinada consulta", security = {
 			@SecurityRequirement(name = "bearer-key") })
 	public ResponseEntity get(@Parameter(description = "Identificador da consulta a ser consultada") Long id) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+		Usuario usuarioAutenticado = usuarioService.findByEmail(username).orElse(null);
+		if (usuarioAutenticado == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+
 		var retorno = getService().get(id);
 		if (retorno == null)
 			return ResponseEntity.notFound().build();
+
+		if (usuarioAutenticado.getPerfil() == Perfil.PACIENTE) {
+			if (!Long.valueOf(usuarioAutenticado.getPaciente().getId()).equals(retorno.getPatient().getId())) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+		}
+
 		retorno.setPatient(null);
 		return ResponseEntity.ok(retorno);
 	}
@@ -90,6 +119,41 @@ public class ConsultaController extends GenericController<ConsultaDto, Consulta>
 		entity = getService().alter(id, entity);
 		entity.setPatient(patient);
 		return ResponseEntity.ok(entity);
+	}
+
+	@Override
+	@Operation(summary = "Listagem paginada das consultas", description = "Obtém a listagem das consultas disponível e armazenada no banco de dados.", security = { @SecurityRequirement(name = "bearer-key") })
+	public ResponseEntity<Page<Consulta>> list(
+			@Parameter(description = "Parâmetros de filtro disponíveis para filtragem") @RequestParam Map<String, String> params)
+			throws Exception {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+		Usuario usuarioAutenticado = usuarioService.findByEmail(username).orElse(null);
+		if (usuarioAutenticado == null) {
+			logger.warn("Pessoa usuária não autenticada");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		if (usuarioAutenticado.getPerfil().equals(Perfil.PACIENTE)) {
+			long pacienteId = usuarioAutenticado.getPaciente().getId();
+			params.put("patientId", Long.toString(pacienteId));
+		}
+
+		if (!params.isEmpty()) {
+			var filter = this.filterBuilder(params);
+			var list = getService().paged(filter.example(), filter.getPagination());
+			if (list.hasContent())
+				logger.info("Tamanho da lista de consultas encontradas: " + list.getSize());
+				return ResponseEntity.ok(list);
+		} else {
+			var list = getService().all();
+			if (!list.isEmpty()) {
+				logger.info("Total de consultas: " + list.size());
+				PageImpl<Consulta> p = new PageImpl<>(list);
+				return ResponseEntity.ok(p);
+			}
+		}
+		return ResponseEntity.notFound().build();
 	}
 
 }
