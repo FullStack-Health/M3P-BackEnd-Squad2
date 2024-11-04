@@ -5,6 +5,7 @@ import br.com.pvv.senai.entity.Paciente;
 import br.com.pvv.senai.entity.Usuario;
 import br.com.pvv.senai.enums.Perfil;
 import br.com.pvv.senai.repository.PacienteRepository;
+import br.com.pvv.senai.repository.UserRepository;
 import br.com.pvv.senai.service.EnderecoService;
 import br.com.pvv.senai.service.PacienteService;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,11 +37,15 @@ public class PacienteServicetTest {
 	@Mock
 	EnderecoService enderecoService;
 
+	@Mock
+	UserRepository userRepository;
+
 	@InjectMocks
 	PacienteService service;
 
 	Paciente paciente;
 	Usuario usuario;
+	Usuario usuarioPaciente;
 
 	@BeforeEach
 	void setUp() {
@@ -71,6 +76,18 @@ public class PacienteServicetTest {
 		usuario.setPassword("senha123");
 		usuario.setSenhaMascarada("****");
 		usuario.setPerfil(Perfil.ADMIN);
+
+		usuarioPaciente = new Usuario();
+		usuarioPaciente.setId(1L);
+		usuarioPaciente.setEmail("usuario-paciente@teste.com");
+		usuarioPaciente.setTelefone("123456789");
+		usuarioPaciente.setEmail("joao.selva@example.com");
+		usuarioPaciente.setCpf("123.456.000-00");
+		usuarioPaciente.setPassword("senha123");
+		usuarioPaciente.setSenhaMascarada("****");
+		usuarioPaciente.setPerfil(Perfil.PACIENTE);
+
+		paciente.setUsuario(usuarioPaciente);
 
 		try {
 			paciente.setInsuranceExpiration(new SimpleDateFormat("yyyy-MM-dd").parse("2025-12-31"));
@@ -150,16 +167,22 @@ public class PacienteServicetTest {
 	@Test
 	@DisplayName("Deve alterar pessoa paciente")
 	void alter() {
+		Endereco endereco = new Endereco();
 		// Given
+		when(userService.getRepository()).thenReturn(userRepository);
 		when(repository.save(any(Paciente.class))).thenReturn(paciente);
 		when(userService.findByEmail(anyString())).thenReturn(Optional.of(usuario));
+		when(enderecoService.create(any(Endereco.class))).thenReturn(endereco);
+		when(repository.findById(anyLong())).thenReturn(Optional.of(paciente));
 		// When
 		Paciente pacienteAlterado = service.alter(1L, paciente);
 		// Then
 		assertNotNull(pacienteAlterado);
 		assertEquals(paciente.getId(), pacienteAlterado.getId());
+		verify(repository).findById(anyLong());
 		verify(repository).save(any(Paciente.class));
 		verify(userService).findByEmail(anyString());
+		verify(userService).alter(anyLong(), any(Usuario.class));
 	}
 
 	@Test
