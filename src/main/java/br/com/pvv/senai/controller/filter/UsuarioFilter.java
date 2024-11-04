@@ -1,13 +1,12 @@
 package br.com.pvv.senai.controller.filter;
 
-import java.util.Map;
-
+import br.com.pvv.senai.entity.Usuario;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import br.com.pvv.senai.entity.Usuario;
+import java.util.Map;
 
 public class UsuarioFilter implements IFilter<Usuario> {
 
@@ -32,20 +31,6 @@ public class UsuarioFilter implements IFilter<Usuario> {
 	public Example<Usuario> example() {
 
 		ExampleMatcher example = ExampleMatcher.matching();
-
-//		if (getId() == 0)
-//			example = ExampleMatcher.matchingAny()
-////					.withMatcher("id", match -> match.exact())
-//					.withMatcher("telefone", match -> match.ignoreCase().contains())
-//					.withMatcher("email", match -> match.ignoreCase().contains()) //
-//					.withIgnorePaths("id") //
-//					.withIgnoreNullValues();
-//		else
-//			example = ExampleMatcher.matchingAny().withMatcher("id", match -> match.exact())
-//					.withMatcher("telefone", match -> match.ignoreCase().contains())
-//					.withMatcher("email", match -> match.ignoreCase().contains()) //
-////					.withIgnorePaths("id") //
-//					.withIgnoreNullValues();
 
 		Usuario usuario = new Usuario();
 		if (getId() != 0)

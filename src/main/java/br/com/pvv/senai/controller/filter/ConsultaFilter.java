@@ -1,24 +1,28 @@
 package br.com.pvv.senai.controller.filter;
 
-import java.util.Map;
-
+import br.com.pvv.senai.entity.Consulta;
+import br.com.pvv.senai.entity.Paciente;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import br.com.pvv.senai.entity.Consulta;
+import java.util.Map;
 
 public class ConsultaFilter implements IFilter<Consulta> {
 
 	private String reason;
 	private int pageSize;
 	private int pageNumber;
+	private Long patientId;
 
 	public ConsultaFilter(Map<String, String> params) {
 		setReason(params.get("reason"));
 		setPageNumber(params.get("pageNumber") != null ? Integer.parseInt(params.get("pageNumber")) : 0);
 		setPageSize(params.get("pageSize") != null ? Integer.parseInt(params.get("pageSize")) : 10);
+		if (params.get("patientId") != null) {
+			setPatientId(Long.parseLong(params.get("patientId")));
+		}
 	}
 
 	@Override
@@ -29,6 +33,12 @@ public class ConsultaFilter implements IFilter<Consulta> {
 
 		var probe = new Consulta();
 		probe.setReason(getReason());
+
+		if (getPatientId() != null) {
+			var paciente = new Paciente();
+			paciente.setId(getPatientId());
+			probe.setPatient(paciente);
+		}
 
 		return Example.of(probe, matcher);
 	}
@@ -62,4 +72,7 @@ public class ConsultaFilter implements IFilter<Consulta> {
 		this.pageNumber = pageNumber;
 	}
 
+	public Long getPatientId() { return patientId; }
+
+	public void setPatientId(Long patientId) { this.patientId = patientId; }
 }

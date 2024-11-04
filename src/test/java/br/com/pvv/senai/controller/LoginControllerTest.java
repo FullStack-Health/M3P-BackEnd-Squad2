@@ -1,10 +1,9 @@
 package br.com.pvv.senai.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDate;
-
+import br.com.pvv.senai.entity.Usuario;
+import br.com.pvv.senai.enums.Perfil;
+import br.com.pvv.senai.repository.UserRepository;
+import br.com.pvv.senai.security.TokenService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,10 +18,10 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import br.com.pvv.senai.entity.Usuario;
-import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.repository.UserRepository;
-import br.com.pvv.senai.security.TokenService;
+import java.time.LocalDate;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,10 +31,8 @@ public class LoginControllerTest {
 	@Autowired
 	MockMvc mvc;
 
-//	@MockBean
 	@Autowired
 	private UserRepository repository;
-	
 
 	@MockBean
 	private TokenService jwtService;
@@ -89,12 +86,6 @@ public class LoginControllerTest {
 	@WithAnonymousUser
 	void login() throws Exception {
 
-//		var token = "Token Válido";
-
-//		when(manager.authenticate(any())).thenReturn(null);
-//		when(repository.findByEmail(any(String.class))).thenReturn(Optional.of(usuarioCorrect));
-//		when(jwtService.generateToken(any(Usuario.class))).thenReturn(token);
-		
 		mvc.perform(post("/login").contentType(MediaType.APPLICATION_JSON).content(
 				"""
 				{
@@ -102,9 +93,6 @@ public class LoginControllerTest {
 				  "password": "12341234"
 				}
 				""")).andExpect(status().isOk());
-
-//		verify(repository).findByEmail(any(String.class));
-//		verify(jwtService).generateToken(any(Usuario.class));
 	}
 
 }

@@ -1,21 +1,5 @@
 package br.com.pvv.senai.controller;
 
-import java.util.Comparator;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import br.com.pvv.senai.controller.filter.IFilter;
 import br.com.pvv.senai.controller.filter.PacienteFilter;
 import br.com.pvv.senai.controller.filter.ProntuarioFilter;
@@ -36,6 +20,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Comparator;
+import java.util.Map;
 
 @Controller
 @RestController
@@ -86,14 +82,6 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 		return new PacienteFilter(params);
 	}
 
-//	@GetMapping("prontuarios")
-//	public List<Prontuario> getProntuario(@RequestParam Map<String, String> params) {
-//		var filter = new ProntuarioFilter(params);
-//		var paged = service.paged(filter.example(), filter.getPagination());
-//		var retorno = paged.map(x -> new Prontuario(x.getId(), x.getName(), x.getInsuranceCompany())).toList();
-//		return retorno;
-//	}
-
 	@GetMapping("prontuarios")
 	@Operation(summary = "Consulta prontuários", description = "Obtém os dados do prontuário dos pacientes.", security = { @SecurityRequirement(name = "bearer-key") })
 	public ResponseEntity<Page<ProntuarioDto>> list(
@@ -110,9 +98,7 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 		if (retorno.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
-
 		return ResponseEntity.ok(retorno);
-
 	}
 
 	@GetMapping("{id}/prontuarios")
@@ -125,12 +111,6 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 		if (paciente == null)
 			return ResponseEntity.notFound().build();
 
-//		var retorno = new ProntuarioDetails();
-
-//		retorno.setNome(paciente.getName());
-//		retorno.setCttDeEmergencia(paciente.getEmergencyContact());
-//		retorno.setConvenio(paciente.getInsuranceCompany());
-//
 		var exames = exameService.findByPacienteId(paciente.getId());
 		exames.sort(Comparator.comparing(Exame::getDataExame));
 
@@ -143,4 +123,29 @@ public class PacienteController extends GenericController<PacienteDto, Paciente>
 
 		return ResponseEntity.ok(retorno);
 	}
+
+	@Override
+	@GetMapping("{id}")
+	@Operation(summary = "Consulta entidade", description = "Obtém os dados de entidade paciente", security = { @SecurityRequirement(name = "bearer-key") })
+	public ResponseEntity get(
+			@Parameter(description = "Identificador da entidade requisitada", required = true) @PathVariable Long id) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+		Usuario usuarioAutenticado = usuarioService.findByEmail(username).orElse(null);
+		if (usuarioAutenticado == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		if (usuarioAutenticado.getPerfil() == Perfil.PACIENTE) {
+			if (!Long.valueOf(usuarioAutenticado.getPaciente().getId()).equals(id)) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+		}
+		var retorno = getService().get(id);
+		if (retorno == null)
+			return ResponseEntity.notFound().build();
+		return ResponseEntity.ok(retorno);
+	};
+
+
 }

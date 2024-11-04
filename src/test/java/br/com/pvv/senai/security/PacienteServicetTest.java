@@ -1,39 +1,30 @@
 package br.com.pvv.senai.security;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Optional;
-
+import br.com.pvv.senai.entity.Endereco;
+import br.com.pvv.senai.entity.Paciente;
+import br.com.pvv.senai.entity.Usuario;
+import br.com.pvv.senai.enums.Perfil;
+import br.com.pvv.senai.repository.PacienteRepository;
+import br.com.pvv.senai.repository.UserRepository;
+import br.com.pvv.senai.service.EnderecoService;
+import br.com.pvv.senai.service.PacienteService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 
-import br.com.pvv.senai.entity.Endereco;
-import br.com.pvv.senai.entity.Paciente;
-import br.com.pvv.senai.entity.Usuario;
-import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.repository.PacienteRepository;
-import br.com.pvv.senai.service.EnderecoService;
-import br.com.pvv.senai.service.PacienteService;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class PacienteServicetTest {
 
@@ -46,11 +37,15 @@ public class PacienteServicetTest {
 	@Mock
 	EnderecoService enderecoService;
 
+	@Mock
+	UserRepository userRepository;
+
 	@InjectMocks
 	PacienteService service;
 
 	Paciente paciente;
 	Usuario usuario;
+	Usuario usuarioPaciente;
 
 	@BeforeEach
 	void setUp() {
@@ -71,7 +66,6 @@ public class PacienteServicetTest {
 		paciente.setSpecialCare("Nenhum");
 		paciente.setInsuranceCompany("Saúde Total");
 		paciente.setInsuranceNumber("1234567890");
-//		paciente.setAddress(new Endereco());
 
 		usuario = new Usuario();
 		usuario.setId(1L);
@@ -83,12 +77,23 @@ public class PacienteServicetTest {
 		usuario.setSenhaMascarada("****");
 		usuario.setPerfil(Perfil.ADMIN);
 
+		usuarioPaciente = new Usuario();
+		usuarioPaciente.setId(1L);
+		usuarioPaciente.setEmail("usuario-paciente@teste.com");
+		usuarioPaciente.setTelefone("123456789");
+		usuarioPaciente.setEmail("joao.selva@example.com");
+		usuarioPaciente.setCpf("123.456.000-00");
+		usuarioPaciente.setPassword("senha123");
+		usuarioPaciente.setSenhaMascarada("****");
+		usuarioPaciente.setPerfil(Perfil.PACIENTE);
+
+		paciente.setUsuario(usuarioPaciente);
+
 		try {
 			paciente.setInsuranceExpiration(new SimpleDateFormat("yyyy-MM-dd").parse("2025-12-31"));
 			usuario.setDataNascimento(new SimpleDateFormat("yyyy-MM-dd").parse("1990-01-01"));
 			paciente.setBirthDate(new SimpleDateFormat("yyyy-MM-dd").parse("1985-05-15"));
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -162,16 +167,22 @@ public class PacienteServicetTest {
 	@Test
 	@DisplayName("Deve alterar pessoa paciente")
 	void alter() {
+		Endereco endereco = new Endereco();
 		// Given
+		when(userService.getRepository()).thenReturn(userRepository);
 		when(repository.save(any(Paciente.class))).thenReturn(paciente);
 		when(userService.findByEmail(anyString())).thenReturn(Optional.of(usuario));
+		when(enderecoService.create(any(Endereco.class))).thenReturn(endereco);
+		when(repository.findById(anyLong())).thenReturn(Optional.of(paciente));
 		// When
 		Paciente pacienteAlterado = service.alter(1L, paciente);
 		// Then
 		assertNotNull(pacienteAlterado);
 		assertEquals(paciente.getId(), pacienteAlterado.getId());
+		verify(repository).findById(anyLong());
 		verify(repository).save(any(Paciente.class));
 		verify(userService).findByEmail(anyString());
+		verify(userService).alter(anyLong(), any(Usuario.class));
 	}
 
 	@Test

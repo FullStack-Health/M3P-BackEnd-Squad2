@@ -1,20 +1,15 @@
 package br.com.pvv.senai.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import br.com.pvv.senai.entity.Consulta;
+import br.com.pvv.senai.entity.Endereco;
+import br.com.pvv.senai.entity.Paciente;
+import br.com.pvv.senai.entity.Usuario;
+import br.com.pvv.senai.enums.Perfil;
+import br.com.pvv.senai.model.dto.ConsultaDto;
+import br.com.pvv.senai.model.dto.PacienteDto;
+import br.com.pvv.senai.security.UsuarioService;
+import br.com.pvv.senai.service.ConsultaService;
+import br.com.pvv.senai.service.PacienteService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,18 +20,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.web.client.RestTemplate;
 
-import br.com.pvv.senai.entity.Consulta;
-import br.com.pvv.senai.entity.Endereco;
-import br.com.pvv.senai.entity.Paciente;
-import br.com.pvv.senai.entity.Usuario;
-import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.model.dto.ConsultaDto;
-import br.com.pvv.senai.model.dto.PacienteDto;
-import br.com.pvv.senai.service.ConsultaService;
-import br.com.pvv.senai.service.PacienteService;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
@@ -47,6 +46,9 @@ public class ConsultaControllerTest {
 
 	@Mock
 	ConsultaService service;
+
+	@Mock
+	UsuarioService usuarioService;
 	
 	@Mock
 	PacienteService patientService;
@@ -143,10 +145,25 @@ public class ConsultaControllerTest {
 		clearEntitys();
 	};
 
+	void authenticationMock(){
+		Authentication authentication = mock(Authentication.class);
+		when(authentication.getName()).thenReturn("mockUser");
+		SecurityContext securityContext = mock(SecurityContext.class);
+		when(securityContext.getAuthentication()).thenReturn(authentication);
+		SecurityContextHolder.setContext(securityContext);
+
+		Usuario usuarioAutenticado = mock(Usuario.class);
+		when(usuarioAutenticado.getPerfil()).thenReturn(Perfil.ADMIN);
+		when(usuarioService.findByEmail("mockUser")).thenReturn(Optional.of(usuarioAutenticado));
+	}
+
 	@Test
-	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA DE USUÁRIOS")
+	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA DE CONSULTAS")
 	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO", "PACIENTE" })
 	void list_200() throws Exception {
+
+		this.authenticationMock();
+
 		when(service.all()).thenReturn(List.of(consulta));
 
 		var resp = controller.list(Map.of());
@@ -161,9 +178,12 @@ public class ConsultaControllerTest {
 	}
 
 	@Test
-	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA DE USUÁRIOS COM FILTRO REASON")
+	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA DE CONSULTAS COM FILTRO REASON")
 	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO", "PACIENTE" })
 	void list_200_withFilter() throws Exception {
+
+		this.authenticationMock();
+
 		when(service.paged(any(), any())).thenReturn(new PageImpl(List.of(consulta)));
 
 		var resp = controller.list(Map.of("reason", consulta.getReason()));
@@ -177,8 +197,11 @@ public class ConsultaControllerTest {
 	}
 
 	@Test
-	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA DE USUÁRIOS COM FILTRO REASON")
-	void list_404_withFilter() throws Exception {
+	@DisplayName("LISTA CONSULTA - 200 - OBTÉM LISTA VAZIA")
+	void list_200_withFilter_empty() throws Exception {
+
+		this.authenticationMock();
+
 		when(service.paged(any(), any())).thenReturn(new PageImpl(List.of()));
 
 		var resp = controller.list(Map.of("reason", consulta.getReason() + "xx"));
@@ -186,8 +209,8 @@ public class ConsultaControllerTest {
 		verify(service).paged(any(), any());
 
 		assertNotNull(resp);
-		assertNull(resp.getBody());
-		assertEquals("404 NOT_FOUND", resp.getStatusCode().toString());
+		assertTrue(resp.getBody().isEmpty());
+		assertEquals("200 OK", resp.getStatusCode().toString());
 	}
 
 	@Test

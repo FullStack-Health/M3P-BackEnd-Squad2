@@ -26,16 +26,5 @@ public class SwaggerConfig {
 	          .addSecuritySchemes("bearer-key",
 	          new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")));
 	}
-	
-//	 @Bean
-//	 public OpenAPI customOpenAPI() {
-//	     return new OpenAPI()
-//	             .components(new Components().addSecuritySchemes("basicScheme",
-//	                     new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("basic")))
-//	             .info(new Info().title("SpringShop API").version("0.1")
-//	                     .license(new License().name("Apache 2.0").url("http://springdoc.org")))
-//	             .externalDocs(new ExternalDocumentation()
-//	                     .url("static/openapi.yaml"));
-//	 }
 
 }

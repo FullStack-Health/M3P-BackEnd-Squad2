@@ -1,13 +1,12 @@
 package br.com.pvv.senai.controller.filter;
 
-import java.util.Map;
-
+import br.com.pvv.senai.entity.Paciente;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import br.com.pvv.senai.entity.Paciente;
+import java.util.Map;
 
 public class ProntuarioFilter implements IFilter<Paciente> {
 
@@ -28,9 +27,6 @@ public class ProntuarioFilter implements IFilter<Paciente> {
 
 		ExampleMatcher matcher = ExampleMatcher.matchingAny()
 				.withMatcher("name", match -> match.contains().ignoreCase());
-//				.withMatcher("id", match -> match.exact()) //
-//				.withIgnorePaths("id") //
-//				.withIgnoreNullValues();
 
 		Paciente paciente = new Paciente();
 
