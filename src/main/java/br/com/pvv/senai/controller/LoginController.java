@@ -17,7 +17,6 @@ import br.com.pvv.senai.repository.UserRepository;
 import br.com.pvv.senai.security.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController

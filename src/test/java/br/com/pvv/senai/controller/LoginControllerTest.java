@@ -1,9 +1,10 @@
 package br.com.pvv.senai.controller;
 
-import br.com.pvv.senai.entity.Usuario;
-import br.com.pvv.senai.enums.Perfil;
-import br.com.pvv.senai.repository.UserRepository;
-import br.com.pvv.senai.security.TokenService;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,10 +19,13 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import br.com.pvv.senai.entity.Usuario;
+import br.com.pvv.senai.enums.Perfil;
+import br.com.pvv.senai.repository.ConsultaRepository;
+import br.com.pvv.senai.repository.EnderecoRepository;
+import br.com.pvv.senai.repository.PacienteRepository;
+import br.com.pvv.senai.repository.UserRepository;
+import br.com.pvv.senai.security.TokenService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,6 +37,18 @@ public class LoginControllerTest {
 
 	@Autowired
 	private UserRepository repository;
+	
+	@MockBean
+	ConsultaRepository cRepository;
+	
+	@MockBean
+	PacienteRepository pRepository;
+	
+	@MockBean
+	EnderecoRepository eRepository;
+	
+	@MockBean
+	UserRepository uR;
 
 	@MockBean
 	private TokenService jwtService;
