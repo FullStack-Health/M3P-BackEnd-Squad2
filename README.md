@@ -1,5 +1,8 @@
 # LABMedical
 
+Deploy:
+[LABMedical by Qcode](http://labmedical.devplenio.com.br/)
+
 ## Descrição:
 LABMedical é um sistema de gestão para instituições de saúde, projetado para simplificar o processo de registro de pacientes e a gestão de exames e consultas. O presente projeto compões a API REST do sistema, responsável por gerenciar os dados e fornecer informações para o frontend.
 
