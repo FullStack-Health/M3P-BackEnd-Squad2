@@ -156,7 +156,7 @@ class UsuarioControllerTest {
 	}
 
 	@Test
-	@DisplayName("ALTERAR USUÁRIO - 204 - ALTERAR SENHA USUÁRIO")
+	@DisplayName("PUT USUÁRIO - 204 - ALTERAR SENHA USUÁRIO")
 	void put_200() throws Exception {
 		when(usuarioService.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(usuarioCorrect));
 
@@ -190,5 +190,95 @@ class UsuarioControllerTest {
 
 		verify(usuarioService).paged(any(), any());
 	}
+
+	@Test
+	@DisplayName("GET USUÁRIO - 200 - Consulta por ID")
+	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO" })
+	void getUsuario_200() throws Exception {
+		when(usuarioService.get(anyLong())).thenReturn(usuarioCorrect);
+
+		mvc.perform(get("/usuarios/1").with(jwt())).andExpect(status().isOk())
+				.andExpect(jsonPath("$.nome").value("Nome de usuário"));
+
+		verify(usuarioService).get(anyLong());
+	}
+
+	@Test
+	@DisplayName("GET USUÁRIO - 404 - Pessoa usuária não encontrada")
+	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO" })
+	void getUsuario_404() throws Exception {
+		when(usuarioService.get(anyLong())).thenReturn(null);
+
+		mvc.perform(get("/usuarios/1").with(jwt())).andExpect(status().isNotFound());
+
+		verify(usuarioService).get(anyLong());
+	}
+
+	@Test
+	@DisplayName("PUT USUÁRIO - 200 - Atualização de pessoa usuária")
+	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO", "PACIENTE" })
+	void putUsuario_200() throws Exception {
+		usuarioCorrect.setNome("Nome Atualizado");
+		when(usuarioService.get(anyLong())).thenReturn(usuarioCorrect);
+		when(usuarioService.alter(anyLong(), any(Usuario.class))).thenReturn(usuarioCorrect);
+
+		mvc.perform(put("/usuarios/1").with(jwt()).contentType(MediaType.APPLICATION_JSON)
+						.content("""
+                {
+                  "nome": "Nome Atualizado",
+                  "email": "usuario@teste.com",
+                  "dataNascimento": "1980-10-10",
+                  "telefone": "(48) 9 9999-9999",
+                  "cpf": "000.000.000-00"
+                }
+            """)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.nome").value("Nome Atualizado"));
+
+		verify(usuarioService).alter(anyLong(), any(Usuario.class));
+	}
+
+	@Test
+	@DisplayName("PUT USUÁRIO - 404 - Pessoa usuária não encontrada")
+	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO", "PACIENTE" })
+	void putUsuario_404() throws Exception {
+		when(usuarioService.get(anyLong())).thenReturn(null);
+
+		mvc.perform(put("/usuarios/1").with(jwt()).contentType(MediaType.APPLICATION_JSON)
+				.content("""
+                {
+                  "nome": "Nome Atualizado",
+                  "email": "usuario@teste.com",
+                  "dataNascimento": "1980-10-10",
+                  "telefone": "(48) 9 9999-9999",
+                  "cpf": "000.000.000-00"
+                }
+            """)).andExpect(status().isNotFound());
+
+		verify(usuarioService, never()).alter(anyLong(), any(Usuario.class));
+	}
+
+	@Test
+	@DisplayName("DELETE USUÁRIO - 204 - Exclusão de pessoa usuária")
+	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO", "PACIENTE" })
+	void deleteUsuario_204() throws Exception {
+		when(usuarioService.delete(anyLong())).thenReturn(true);
+
+		mvc.perform(delete("/usuarios/1").with(jwt())).andExpect(status().isNoContent());
+
+		verify(usuarioService).delete(anyLong());
+	}
+
+	@Test
+	@DisplayName("DELETE USUÁRIO - 404 - Pessoa usuária não encontrada")
+	@WithMockUser(username = "admin", roles = { "ADMIN", "MEDICO", "PACIENTE" })
+	void deleteUsuario_404() throws Exception {
+		when(usuarioService.delete(anyLong())).thenReturn(false);
+
+		mvc.perform(delete("/usuarios/1").with(jwt())).andExpect(status().isNotFound());
+
+		verify(usuarioService).delete(anyLong());
+	}
+
+
 
 }
