@@ -15,16 +15,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class PacienteServicetTest {
 
@@ -97,6 +99,9 @@ public class PacienteServicetTest {
 			e.printStackTrace();
 		}
 
+		JpaRepository<Usuario, Long> usuarioRepository = mock(JpaRepository.class);
+		when(userService.getRepository()).thenReturn(usuarioRepository);
+
 	}
 
 	@Test
@@ -146,7 +151,7 @@ public class PacienteServicetTest {
 		// Then
 		assertNotNull(pacienteSalvo);
 		assertEquals(paciente.getId(), pacienteSalvo.getId());
-//		verify(repository).save(any(Paciente.class));
+		verify(repository).save(any(Paciente.class));
 		verify(enderecoService).create(any());
 		verify(userService).findByEmail(anyString());
 	}
@@ -207,6 +212,101 @@ public class PacienteServicetTest {
 		// Then
 		assertEquals(1L, quantidade);
 		verify(repository).count();
+	}
+
+	@Test
+	@DisplayName("Deve lançar exceção ao criar paciente sem registro de pessoa usuária válido")
+	void createThrowsWhenUsuarioNotFound() {
+		// Given
+		when(userService.findByEmail(anyString())).thenReturn(empty());
+		// When & Then
+		assertThrows(NoSuchElementException.class, () -> service.create(paciente));
+		verify(userService).findByEmail(anyString());
+	}
+
+	@Test
+	@DisplayName("Deve lançar exceção ao tentar alterar paciente inexistente")
+	void alterThrowsWhenPacienteNotFound() {
+		// Given
+		when(repository.findById(anyLong())).thenReturn(Optional.empty());
+		// When & Then
+		assertThrows(NoSuchElementException.class, () -> service.alter(1L, paciente));
+		verify(repository).findById(1L);
+	}
+
+	@Test
+	@DisplayName("Deve lançar exceção ao tentar alterar paciente com pessoa usuária inexistente")
+	void alterThrowsWhenUsuarioNotFound() {
+		// Given
+		when(repository.findById(anyLong())).thenReturn(Optional.of(paciente));
+		when(userService.findByEmail(anyString())).thenReturn(Optional.empty());
+		// When & Then
+		assertThrows(NoSuchElementException.class, () -> service.alter(1L, paciente));
+		verify(userService).findByEmail(anyString());
+	}
+
+
+	@Test
+	@DisplayName("Deve retornar um registro de paciente existente ao buscar por email")
+	void findByEmail() {
+		// Given
+		when(repository.findByEmail(anyString())).thenReturn(paciente);
+		// When
+		Paciente pacienteEncontrado = service.findByEmail("paciente@teste.com");
+		// Then
+		assertNotNull(pacienteEncontrado);
+		assertEquals(paciente, pacienteEncontrado);
+		verify(repository).findByEmail("paciente@teste.com");
+	}
+
+	@Test
+	@DisplayName("Deve retornar nulo ao buscar paciente inexistente por email")
+	void findByEmailWhenPacienteNull() {
+		// Given
+		when(repository.findByEmail(anyString())).thenReturn(null);
+		// When
+		Paciente pacienteEncontrado = service.findByEmail("paciente@teste.com");
+		// Then
+		assertNull(pacienteEncontrado);
+		verify(repository).findByEmail("paciente@teste.com");
+
+	}
+
+	@Test
+	@DisplayName("Deve criar novo Endereço quando ID do endereço é 0")
+	void alterCreatesNewEnderecoWhenEnderecoIdIsZero() {
+		// Given
+		Endereco endereco = new Endereco();
+		endereco.setId(0L);
+		paciente.setAddress(endereco);
+		when(repository.findById(anyLong())).thenReturn(Optional.of(paciente));
+		when(enderecoService.create(any(Endereco.class))).thenReturn(new Endereco());
+		when(userService.findByEmail(anyString())).thenReturn(Optional.of(usuario));
+		when(repository.save(any(Paciente.class))).thenReturn(paciente);
+		// When
+		Paciente pacienteAlterado = service.alter(1L, paciente);
+		// Then
+		assertNotNull(pacienteAlterado);
+		verify(enderecoService).create(any(Endereco.class));
+		verify(repository).save(any(Paciente.class));
+	}
+
+	@Test
+	@DisplayName("Não deve criar novo endereço quando ID do endereço não é 0")
+	void alterDoesNotCreateNewEnderecoWhenEnderecoIdIsNotZero() {
+		// Given
+		Endereco endereco = new Endereco();
+		endereco.setId(1L);
+		paciente.setAddress(endereco);
+		when(repository.findById(anyLong())).thenReturn(Optional.of(paciente));
+		when(userService.findByEmail(anyString())).thenReturn(Optional.of(usuario));
+		when(repository.save(any(Paciente.class))).thenReturn(paciente);
+		// When
+		Paciente pacienteAlterado = service.alter(1L, paciente);
+		// Then
+		assertNotNull(pacienteAlterado);
+		verify(enderecoService, never()).create(any(Endereco.class));
+		verify(repository).save(any(Paciente.class));
 	}
 
 }
